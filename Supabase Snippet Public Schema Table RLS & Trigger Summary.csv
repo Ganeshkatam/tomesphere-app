@@ -1,0 +1,84 @@
+table_name,column_names,rls_policies,triggers
+ab_experiments,"id, name, variant_a, variant_b, status, created_at",Admins manage experiments (ALL),No Triggers
+achievements,"id, name, description, badge_icon, condition_type, condition_value, points, created_at",Only admins can manage achievements (ALL) | Achievements viewable by everyone (SELECT),No Triggers
+activity_log,"id, user_id, action_type, book_id, metadata, created_at",Admins can view all activity (SELECT) | Users can view own activity (SELECT) | Users can insert own activity (INSERT),No Triggers
+ai_recommendations,"id, user_id, book_id, reason, confidence_score, algorithm, was_accepted, created_at, interacted_at",AI recommendations private to user (ALL),No Triggers
+announcements,"id, title, content, type, is_active, starts_at, ends_at, target_audience, created_by, created_at, updated_at",Admins can manage announcements (ALL) | Everyone can view active announcements (SELECT),No Triggers
+author_qa_sessions,"id, author_name, title, description, scheduled_at, created_at",No Policies (Public or Restricted),No Triggers
+badges,"id, name, description, icon_url, criteria, created_at",Everyone views badges (SELECT),No Triggers
+book_club_books,"id, club_id, book_id, start_date, end_date, is_current, added_at",No Policies (Public or Restricted),No Triggers
+book_club_members,"club_id, user_id, role, joined_at",No Policies (Public or Restricted),club_member_count_trigger
+book_clubs,"id, name, description, creator_id, cover_image, is_public, member_count, created_at, updated_at, is_private",Anyone can view public clubs (SELECT) | Users can create clubs (INSERT) | Public clubs viewable by everyone (SELECT) | Members can view their clubs (SELECT) | Creators can update clubs (UPDATE),No Triggers
+book_lists,"id, user_id, name, description, is_public, created_at, updated_at",Users can view public lists and own lists (SELECT) | Users can manage own lists (ALL),update_book_lists_updated_at
+book_quotes,"id, book_id, user_id, quote_text, page_number, is_public, created_at",No Policies (Public or Restricted),No Triggers
+book_series,"id, name, description, total_books, created_at",No Policies (Public or Restricted),No Triggers
+book_tags,"book_id, tag_id, created_at",Book tags viewable by everyone (SELECT),tag_usage_count_trigger
+bookmarks,"id, user_id, book_id, page_number, label, created_at",Users can insert own bookmarks (INSERT) | Users can manage own bookmarks (ALL) | Users can view own bookmarks (SELECT) | Users can delete own bookmarks (DELETE),No Triggers
+books,"id, title, author, genre, description, release_date, cover_url, isbn, pages, publisher, language, is_featured, created_at, updated_at, pdf_url, epub_url, format, file_size_mb, download_count, view_count, series_id, series_position, file_size, series, series_order, academic_subject, is_textbook, edition, total_pages",Books are viewable by everyone (SELECT) | Only admins can update books (UPDATE) | Only admins can insert books (INSERT) | Only admins can delete books (DELETE),update_books_updated_at
+challenge_participants,"id, challenge_id, user_id, books_completed, joined_at",No Policies (Public or Restricted),No Triggers
+club_members,"id, club_id, user_id, role, joined_at",Anyone can view club members (SELECT) | Users can leave clubs (DELETE) | Users can join clubs (INSERT),No Triggers
+collection_items,"id, collection_id, book_id, added_at, position",Collection items viewable if collection is (SELECT) | Users can manage own collection items (ALL),collection_items_update_parent
+collections,"id, user_id, name, description, is_public, cover_image, created_at, updated_at",Public collections viewable by all (SELECT) | Users can view own collections (SELECT) | Users can update own collections (UPDATE) | Users can insert own collections (INSERT) | Users can delete own collections (DELETE),No Triggers
+comment_likes,"id, comment_id, user_id, created_at",Users can manage own comment likes (ALL) | Anyone can view comment likes (SELECT),No Triggers
+comments,"id, book_id, user_id, content, parent_id, created_at, updated_at",Users can update own comments (UPDATE) | Users can insert own comments (INSERT) | Users can delete own comments (DELETE) | Comments are viewable by everyone (SELECT),update_comments_updated_at
+discussion_comments,"id, discussion_id, user_id, content, parent_comment_id, created_at, updated_at",Users can update own comments (UPDATE) | Users can create comments (INSERT) | Anyone can view comments (SELECT) | Users can delete own comments (DELETE),No Triggers
+discussion_likes,"id, discussion_id, user_id, created_at",Users can manage own likes (ALL) | Anyone can view likes (SELECT),No Triggers
+discussion_replies,"id, discussion_id, user_id, content, parent_reply_id, created_at, updated_at",Replies viewable by everyone (SELECT) | Authenticated users can create replies (INSERT) | Users can update own replies (UPDATE) | Users can delete own replies (DELETE),No Triggers
+discussions,"id, book_id, user_id, title, content, is_pinned, view_count, created_at, updated_at",Discussions viewable by everyone (SELECT) | Users can update own discussions (UPDATE) | Authenticated users can create discussions (INSERT) | Users can delete own discussions (DELETE),No Triggers
+event_registrations,"id, event_id, user_id, registered_at",No Policies (Public or Restricted),No Triggers
+flashcards,"id, user_id, book_id, front_text, back_text, subject, created_at",Users can view their own flashcards (SELECT) | Users can delete their own flashcards (DELETE) | Users can insert their own flashcards (INSERT) | Users can update their own flashcards (UPDATE),No Triggers
+forum_categories,"id, name, description, created_at",No Policies (Public or Restricted),No Triggers
+forum_replies,"id, thread_id, user_id, content, created_at",No Policies (Public or Restricted),No Triggers
+forum_threads,"id, category_id, user_id, title, content, is_pinned, is_locked, created_at",No Policies (Public or Restricted),No Triggers
+group_files,"id, group_id, uploaded_by, file_name, file_url, file_type, created_at",Members can upload files (INSERT) | Members can view files (SELECT),No Triggers
+group_members,"id, group_id, user_id, role, joined_at",Users can join groups (INSERT) | Users can leave groups (DELETE) | Users can view group members (SELECT),No Triggers
+group_messages,"id, group_id, user_id, message, created_at",Members can post messages (INSERT) | Members can view messages (SELECT),No Triggers
+highlights,"id, user_id, book_id, text, page_number, color, note, is_public, created_at, updated_at",Users can view own highlights (SELECT) | Public highlights viewable by all (SELECT) | Users can manage own highlights (ALL),No Triggers
+likes,"id, book_id, user_id, created_at",Likes are viewable by everyone (SELECT) | Users can delete own likes (DELETE) | Users can insert own likes (INSERT),No Triggers
+list_items,"id, list_id, book_id, added_at",Users can view items in accessible lists (SELECT) | Users can manage items in own lists (ALL),No Triggers
+live_events,"id, title, description, event_type, scheduled_at, duration_minutes, created_at",No Policies (Public or Restricted),No Triggers
+login_history,"id, user_id, login_at, ip_address, user_agent, success, failure_reason",System can insert login history (INSERT) | Admins can view all login history (SELECT) | Users can view own login history (SELECT),No Triggers
+newsletters,"id, subject, body, html_body, segment, status, scheduled_at, sent_at, recipients_count, open_count, click_count, created_by, created_at",Admins can manage newsletters (ALL),No Triggers
+notes,"id, user_id, book_id, title, content, tags, created_at, updated_at",Users can view their own notes (SELECT) | Users can insert their own notes (INSERT) | Users can delete their own notes (DELETE) | Users can update their own notes (UPDATE),No Triggers
+notifications,"id, user_id, type, content, link, is_read, created_at",Users can update own notifications (UPDATE) | Users can delete own notifications (DELETE) | Users can view own notifications (SELECT),No Triggers
+partners,"id, name, type, contact_email, status, created_at",Admins manage partners (ALL),No Triggers
+popular_books,"id, title, author, genre, description, release_date, cover_url, isbn, pages, publisher, language, is_featured, created_at, updated_at, pdf_url, epub_url, format, file_size_mb, download_count, view_count, series_id, series_position, like_count, review_count, avg_rating",No Policies (Public or Restricted),No Triggers
+post_comments,"id, post_id, user_id, content, created_at",Users can manage own comments (ALL) | Comments are viewable by everyone (SELECT),No Triggers
+post_likes,"id, post_id, user_id, created_at",Likes are viewable by everyone (SELECT) | Users can manage own likes (ALL),No Triggers
+practice_tests,"id, title, subject, difficulty, created_by, time_limit_minutes, created_at",Anyone can view practice tests (SELECT) | Authenticated users can create tests (INSERT) | Authenticated users can create practice tests (INSERT),No Triggers
+profiles,"id, email, name, role, avatar_url, bio, created_at, updated_at, location, website, twitter_handle, reading_goal_yearly, favorite_genre, is_verified, total_points, reading_streak_days, last_activity_at, favorite_genres, reading_goal, profile_completed, engagement_score, last_login_at, login_count, phone_number, stripe_customer_id",Enable insert for authenticated users (INSERT) | Public profiles are viewable by everyone (SELECT) | Users can update own profile (UPDATE),update_profiles_updated_at
+push_notifications,"id, title, body, sent_to, sent_at, created_at",Admins manage notifications (ALL),No Triggers
+qa_questions,"id, session_id, user_id, question, upvotes, is_answered, created_at",No Policies (Public or Restricted),No Triggers
+ratings,"id, book_id, user_id, rating, created_at, updated_at",Users can view all ratings (SELECT) | Ratings are viewable by everyone (SELECT) | Users can delete own ratings (DELETE) | Users can delete their own ratings (DELETE) | Users can insert own ratings (INSERT) | Users can insert their own ratings (INSERT) | Users can update own ratings (UPDATE) | Users can update their own ratings (UPDATE),update_ratings_updated_at
+reading_activity,"id, user_id, date, created_at",Users can insert own activity (INSERT) | Users can view own activity (SELECT),No Triggers
+reading_challenges,"id, name, description, goal_books, start_date, end_date, created_at",No Policies (Public or Restricted),No Triggers
+reading_goals,"id, user_id, goal_type, target_value, current_value, year, start_date, end_date, is_active, created_at, updated_at",Users can manage own goals (ALL),No Triggers
+reading_lists,"id, book_id, user_id, status, created_at, updated_at",Users can delete own reading lists (DELETE) | Users can view own reading lists (SELECT) | Users can update own reading lists (UPDATE) | Users can insert own reading lists (INSERT),update_reading_lists_updated_at
+reading_notes,"id, user_id, book_id, chapter, page_number, note, is_private, created_at, updated_at",Users can manage own notes (ALL) | Users can view own notes (SELECT),update_reading_notes_updated_at
+reading_progress,"id, user_id, book_id, current_page, total_pages, percentage, last_read_at, started_at, finished_at, reading_time_minutes",Users can insert own reading progress (INSERT) | Users can manage own progress (ALL) | Users can update own reading progress (UPDATE) | Users can view own progress (SELECT) | Users can view own reading progress (SELECT),No Triggers
+reviews,"id, book_id, user_id, content, flagged, flagged_reason, created_at, updated_at",Users can update own reviews (UPDATE) | Admins can update any review (UPDATE) | Reviews are viewable by everyone (SELECT) | Users can delete own reviews (DELETE) | Users can insert own reviews (INSERT),update_reviews_updated_at
+saved_listings,"id, user_id, listing_id, created_at",Users can view their saved listings (SELECT) | Users can unsave listings (DELETE) | Users can save listings (INSERT),No Triggers
+site_config,"id, key, value, description, updated_by, updated_at",Everyone can view site config (SELECT) | Admins can update site config (ALL),No Triggers
+social_posts,"id, user_id, content, book_id, post_type, created_at",Users can manage own posts (ALL) | Posts are viewable by everyone (SELECT),No Triggers
+student_profiles,"id, user_id, email, institution_name, student_id, graduation_year, major, verification_status, verified_at, discount_eligible, created_at, updated_at, verification_method, id_image_url",Users can update their own student profile (UPDATE) | Users can insert their own student profile (INSERT) | Users can view their own student profile (SELECT),No Triggers
+student_verification_tokens,"id, user_id, token, edu_email, expires_at, used, created_at",Users can view their own tokens (SELECT),No Triggers
+student_verifications,"id, user_id, full_name, university_name, student_email, document_url, verification_type, status, admin_notes, created_at, updated_at",Users can insert their own verifications (INSERT) | Users can view their own verifications (SELECT) | Admins can update verifications (UPDATE) | Admins can view all verifications (SELECT),"update_student_verifications_modtime, trigger_auto_verify_student"
+study_groups,"id, name, description, subject, created_by, max_members, is_private, meeting_link, created_at",Anyone can view public groups (SELECT) | Creators can update their groups (UPDATE) | Authenticated users can create groups (INSERT),No Triggers
+subscriptions,"id, user_id, status, price_id, quantity, cancel_at_period_end, created_at, current_period_start, current_period_end, ended_at, cancel_at, canceled_at, trial_start, trial_end",Can view own subscription data. (SELECT),No Triggers
+tags,"id, name, slug, usage_count, created_at",Tags viewable by everyone (SELECT),No Triggers
+test_questions,"id, test_id, question_text, question_type, options, correct_answer, explanation, points, order_index",Anyone can view test questions (SELECT),No Triggers
+textbook_listings,"id, seller_id, book_id, title, author, isbn, edition, condition, price, description, images, status, created_at",Sellers can update their listings (UPDATE) | Users can create their listings (INSERT) | Anyone can view available listings (SELECT) | Sellers can delete their listings (DELETE),No Triggers
+textbook_offers,"id, listing_id, buyer_id, offered_price, message, status, created_at",Users can view relevant offers (SELECT) | Buyers can make offers (INSERT),No Triggers
+transactions,"id, user_id, amount, type, status, created_at",Admins view transactions (SELECT),No Triggers
+user_achievements,"user_id, achievement_id, earned_at",Everyone can view user achievements (SELECT) | Users can view own achievements (SELECT),No Triggers
+user_activity_log,"id, user_id, action_type, action_data, ip_address, user_agent, created_at",Admins can view all activity (SELECT) | System can insert activity (INSERT) | Users can view own activity (SELECT),No Triggers
+user_badges,"user_id, badge_id, earned_at",Users view own badges (SELECT),No Triggers
+user_bans,"id, user_id, reason, banned_by, banned_at, expires_at, is_active, notes",Users can view own bans (SELECT) | Admins can manage bans (ALL),No Triggers
+user_books,"id, user_id, book_id, status, current_page, rating, review, started_at, finished_at, created_at, updated_at",Users can manage own books (ALL),update_user_books_updated_at
+user_follows,"follower_id, following_id, created_at",Users can unfollow (DELETE) | Users can manage own follows (ALL) | Users can follow others (INSERT) | Follows viewable by everyone (SELECT) | Anyone can view follows (SELECT),No Triggers
+user_lists,"id, user_id, book_id, status, progress, created_at, updated_at",Users can manage own list (ALL) | Users can view own list (SELECT),No Triggers
+user_memberships,"id, user_id, tier, started_at, expires_at",No Policies (Public or Restricted),No Triggers
+user_points,"id, user_id, points, level, updated_at",No Policies (Public or Restricted),No Triggers
+user_preferences,"user_id, theme, reading_mode, email_notifications, push_notifications, language, timezone, privacy_settings, created_at, updated_at",Users can manage own preferences (ALL),No Triggers
+user_reading_stats,"user_id, name, books_finished, books_reading, books_want_to_read, total_likes, total_ratings, avg_rating_given",No Policies (Public or Restricted),No Triggers
+user_test_attempts,"id, user_id, test_id, score, answers, completed_at",Users can insert their own test attempts (INSERT) | Users can insert their own attempts (INSERT) | Users can view their own test attempts (SELECT) | Users can view their own attempts (SELECT),No Triggers
