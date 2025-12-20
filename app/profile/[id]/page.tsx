@@ -19,15 +19,14 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
     const [followersCount, setFollowersCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
 
-    // Mock stats for visualization (replace with real aggregations later)
-    const stats = {
-        booksRead: 47,
-        pagesRead: 12580,
-        readingStreak: 15,
-        totalHours: 156,
-        achievements: 12,
-        level: 8
-    };
+    const [stats, setStats] = useState({
+        booksRead: 0,
+        pagesRead: 0,
+        readingStreak: 0,
+        totalHours: 0,
+        achievements: 0,
+        level: 1
+    });
 
     useEffect(() => {
         loadProfile();
@@ -46,14 +45,25 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
                 .single();
 
             if (error) {
-                // If profile not found or other error
                 toast.error('User not found');
                 router.push('/community');
                 return;
             }
             setProfile(profileData);
 
-            // Fetch Social Stats
+            // Fetch Real Stats
+            // 1. Books Read (from reading_lists where status = 'completed')
+            const { count: booksReadCount } = await supabase
+                .from('reading_lists')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', params.id)
+                .eq('status', 'completed');
+
+            // 2. Reading Streak (from profiles table if you have it, or calc from logs - defaulting to profile field or 0)
+            // Assuming profile has 'streak' field, if not default 0
+            const streak = profileData.streak || 0;
+
+            // 3. Followers/Following
             const { count: followers } = await supabase
                 .from('user_follows')
                 .select('*', { count: 'exact', head: true })
@@ -67,7 +77,19 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
             setFollowersCount(followers || 0);
             setFollowingCount(following || 0);
 
-            // Check if current user is following this profile
+            // 4. Level calculation (example logic based on books read)
+            const calculatedLevel = Math.floor(((booksReadCount || 0) / 5) + 1);
+
+            setStats({
+                booksRead: booksReadCount || 0,
+                pagesRead: 0, // Pending 'reading_logs' implementation
+                readingStreak: streak,
+                totalHours: 0, // Pending 'reading_logs' implementation
+                achievements: 0, // Pending 'achievements' table
+                level: calculatedLevel
+            });
+
+            // Check following status
             if (user && user.id !== params.id) {
                 const { data: followData } = await supabase
                     .from('user_follows')

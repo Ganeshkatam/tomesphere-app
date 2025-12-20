@@ -1,0 +1,150 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - main [ref=e3]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - heading "Welcome Back" [level=1] [ref=e8]
+          - paragraph [ref=e9]: Continue your reading journey
+        - generic [ref=e10]:
+          - button "Password" [ref=e11] [cursor=pointer]
+          - button "Magic Code" [ref=e12] [cursor=pointer]:
+            - generic [ref=e13]:
+              - img [ref=e14]
+              - text: Magic Code
+        - generic [ref=e17]:
+          - generic [ref=e19]:
+            - generic:
+              - img
+            - textbox "Email or Phone" [ref=e21]
+          - button "Continue" [disabled] [ref=e22] [cursor=pointer]:
+            - text: Continue
+            - img [ref=e23]
+          - generic [ref=e29]: Or continue with
+          - button "Google One Tap" [ref=e30] [cursor=pointer]:
+            - img [ref=e31]
+            - text: Google One Tap
+        - generic [ref=e36]:
+          - text: Don't have an account?
+          - button "Sign up free" [ref=e37] [cursor=pointer]
+    - contentinfo [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - heading "TomeSphere" [level=3] [ref=e42]
+            - paragraph [ref=e43]: Discover your next favorite book with AI-powered recommendations, curated collections, and a vibrant reading community.
+            - generic [ref=e44]:
+              - link [ref=e45] [cursor=pointer]:
+                - /url: "#"
+                - img [ref=e46]
+              - link [ref=e48] [cursor=pointer]:
+                - /url: "#"
+                - img [ref=e49]
+              - link [ref=e51] [cursor=pointer]:
+                - /url: "#"
+                - img [ref=e52]
+          - generic [ref=e54]:
+            - heading "Quick Links" [level=3] [ref=e55]
+            - list [ref=e56]:
+              - listitem [ref=e57]:
+                - link "Explore Books" [ref=e58] [cursor=pointer]:
+                  - /url: /explore
+              - listitem [ref=e59]:
+                - link "My Library" [ref=e60] [cursor=pointer]:
+                  - /url: /library
+              - listitem [ref=e61]:
+                - link "Discover" [ref=e62] [cursor=pointer]:
+                  - /url: /home
+              - listitem [ref=e63]:
+                - link "My Profile" [ref=e64] [cursor=pointer]:
+                  - /url: /profile
+          - generic [ref=e65]:
+            - heading "Community" [level=3] [ref=e66]
+            - list [ref=e67]:
+              - listitem [ref=e68]:
+                - link "Book Clubs" [ref=e69] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e70]:
+                - link "Forums" [ref=e71] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e72]:
+                - link "Author Q&A" [ref=e73] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e74]:
+                - link "Live Events" [ref=e75] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e76]:
+                - link "Reading Challenges" [ref=e77] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e78]:
+            - heading "Resources" [level=3] [ref=e79]
+            - list [ref=e80]:
+              - listitem [ref=e81]:
+                - link "Help Center" [ref=e82] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e83]:
+                - link "API Documentation" [ref=e84] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e85]:
+                - link "Privacy Policy" [ref=e86] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e87]:
+                - link "Terms of Service" [ref=e88] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e89]:
+                - link "Contact Us" [ref=e90] [cursor=pointer]:
+                  - /url: "#"
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]: 🤖
+            - generic [ref=e95]: AI-Powered Recommendations
+          - generic [ref=e96]:
+            - generic [ref=e97]: 📱
+            - generic [ref=e98]: Mobile PWA Support
+          - generic [ref=e99]:
+            - generic [ref=e100]: 🎯
+            - generic [ref=e101]: 120+ Features
+          - generic [ref=e102]:
+            - generic [ref=e103]: 🌙
+            - generic [ref=e104]: Dark Mode First
+      - generic [ref=e107]:
+        - generic [ref=e108]: © 2025 TomeSphere. All rights reserved.
+        - generic [ref=e109]:
+          - link "Privacy" [ref=e110] [cursor=pointer]:
+            - /url: "#"
+          - link "Terms" [ref=e111] [cursor=pointer]:
+            - /url: "#"
+          - link "Cookies" [ref=e112] [cursor=pointer]:
+            - /url: "#"
+          - link "Sitemap" [ref=e113] [cursor=pointer]:
+            - /url: "#"
+        - generic [ref=e114]: Made with ♥ for book lovers
+      - button "Scroll to top" [ref=e115] [cursor=pointer]:
+        - img [ref=e116]
+  - button "Open Next.js Dev Tools" [ref=e123] [cursor=pointer]:
+    - img [ref=e124]
+  - alert [ref=e127]
+  - button "Open quick access menu":
+    - img
+  - generic [ref=e128]:
+    - generic [ref=e129]:
+      - generic [ref=e130]:
+        - generic [ref=e131]: 📚
+        - generic [ref=e132]: TomeSphere
+      - button "Close menu" [ref=e133] [cursor=pointer]:
+        - img [ref=e134]
+    - generic [ref=e137]:
+      - heading "Quick Access" [level=3] [ref=e138]
+      - button "Explore Books" [ref=e139] [cursor=pointer]:
+        - img [ref=e140]
+        - generic [ref=e143]: Explore Books
+      - button "Sign In" [ref=e144] [cursor=pointer]:
+        - img [ref=e145]
+        - generic [ref=e148]: Sign In
+    - generic [ref=e150]:
+      - generic [ref=e151]: Theme
+      - button "Toggle theme" [ref=e152] [cursor=pointer]:
+        - img [ref=e153]
+```

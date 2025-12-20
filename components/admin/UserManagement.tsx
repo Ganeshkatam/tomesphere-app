@@ -30,8 +30,13 @@ export default function UserManagement() {
     };
 
     const toggleUserRole = async (userId: string, currentRole: string) => {
+        const newRole = currentRole === 'admin' ? 'user' : 'admin';
+
+        if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
+            return;
+        }
+
         try {
-            const newRole = currentRole === 'admin' ? 'user' : 'admin';
             const { error } = await supabase
                 .from('profiles')
                 .update({ role: newRole })
@@ -88,8 +93,8 @@ export default function UserManagement() {
                     >
                         <div className="flex items-center gap-4">
                             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg ${user.role === 'admin'
-                                    ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/20'
-                                    : 'bg-gradient-to-br from-indigo-500 to-purple-600 shadow-indigo-500/20'
+                                ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/20'
+                                : 'bg-gradient-to-br from-indigo-500 to-purple-600 shadow-indigo-500/20'
                                 }`}>
                                 {user.name.charAt(0).toUpperCase()}
                             </div>
