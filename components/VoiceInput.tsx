@@ -35,13 +35,27 @@ export default function VoiceInput({ onTranscript, isListening: externalListenin
                 };
 
                 recognitionInstance.onerror = (event: any) => {
-                    console.error('Speech recognition error:', event.error);
-                    if (event.error === 'no-speech') {
-                        toast.error('No speech detected. Please try again.');
-                    } else if (event.error === 'not-allowed') {
-                        toast.error('Microphone access denied. Please enable it in your browser settings.');
-                    } else {
-                        toast.error('Voice recognition error. Please try again.');
+                    console.error('Speech recognition error details:', event.error);
+
+                    switch (event.error) {
+                        case 'no-speech':
+                            toast.error('No speech detected. Please try again.');
+                            break;
+                        case 'not-allowed':
+                        case 'service-not-allowed':
+                            toast.error('Microphone access denied. Please check permission settings.');
+                            break;
+                        case 'network':
+                            toast.error('Network error. Please check your internet connection.');
+                            break;
+                        case 'aborted':
+                            // Quietly handle aborted sessions (often user action)
+                            break;
+                        case 'language-not-supported':
+                            toast.error('Voice language not supported by this browser.');
+                            break;
+                        default:
+                            toast.error(`Voice error: ${event.error}. Please try again.`);
                     }
                     setIsListening(false);
                 };
@@ -108,8 +122,8 @@ export default function VoiceInput({ onTranscript, isListening: externalListenin
             type="button"
             onClick={toggleListening}
             className={`p-2 rounded-lg transition-all ${isListening
-                    ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse'
-                    : 'bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white'
+                ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse'
+                : 'bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white'
                 } ${className}`}
             title={isListening ? 'Stop recording' : 'Start voice input'}
         >
