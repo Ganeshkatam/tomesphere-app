@@ -33,10 +33,37 @@ serve(async (req) => {
 
         const { filePath } = await req.json()
 
-        if (!filePath) {
-            return new Response(JSON.stringify({ error: 'filePath is required' }), {
+        // Input Validation
+        if (!filePath || typeof filePath !== 'string') {
+            return new Response(JSON.stringify({ error: 'filePath is required and must be a string' }), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                 status: 400,
+            })
+        }
+
+        if (filePath.length > 1024) {
+            return new Response(JSON.stringify({ error: 'filePath too long' }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 400,
+            })
+        }
+
+        // Prevent directory traversal attacks
+        if (filePath.includes('..')) {
+            return new Response(JSON.stringify({ error: 'Invalid file path' }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 400,
+            })
+        }
+
+        // Security: Path Scoping
+        // Enforce that users can only access their own folder
+        // Expected format: user_id/filename
+        if (!filePath.startsWith(`${user.id}/`)) {
+            console.warn(`[Security Alert] User ${user.id} attempted to access unauthorized path: ${filePath}`)
+            return new Response(JSON.stringify({ error: 'Forbidden: You can only generate URLs for your own files' }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 403,
             })
         }
 

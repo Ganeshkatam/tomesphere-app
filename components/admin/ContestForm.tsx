@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 import { X, Upload, Calendar, Trophy, Image as ImageIcon } from 'lucide-react';
+import VoiceInput from '@/components/ui/VoiceInput';
 
 interface ContestFormProps {
     contest?: any;
@@ -95,29 +96,39 @@ export default function ContestForm({ contest, onClose, onSuccess }: ContestForm
                     {/* Title */}
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">Contest Title</label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            required
-                            placeholder="e.g. Summer Reading Sprint"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleChange}
+                                required
+                                placeholder="e.g. Summer Reading Sprint"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                            />
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                <VoiceInput onTranscript={(text) => setFormData(prev => ({ ...prev, title: text }))} />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Description */}
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
-                        <textarea
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            required
-                            rows={4}
-                            placeholder="Describe the rules and goals..."
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
-                        />
+                        <div className="relative">
+                            <textarea
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                required
+                                rows={4}
+                                placeholder="Describe the rules and goals..."
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+                            />
+                            <div className="absolute right-2 top-3">
+                                <VoiceInput onTranscript={(text) => setFormData(prev => ({ ...prev, description: prev.description ? prev.description + ' ' + text : text }))} />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Dates */}

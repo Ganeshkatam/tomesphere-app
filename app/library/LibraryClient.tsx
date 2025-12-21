@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { supabase, getCurrentUser } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import BookCard from '@/components/BookCard';
-import VoiceInput from '@/components/VoiceInput';
+import VoiceInput from '@/components/ui/VoiceInput';
+
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function LibraryClient() {
@@ -90,13 +91,27 @@ export default function LibraryClient() {
                 </div>
 
                 {/* Search Bar */}
-                <div className="mb-6 flex gap-2">
+                <div className="mb-6 flex gap-2 relative">
                     <input
                         type="text"
                         placeholder="Search your library..."
-                        className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50"
+                        className="flex-1 px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50"
                     />
-                    <VoiceInput onTranscript={(text) => console.log(text)} />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <VoiceInput onTranscript={(text) => {
+                            // Note: LibraryClient search logic is currently missing/visual only in original.
+                            // We will just log it or set a hypothetical state if needed, or just let it type into input if controlled.
+                            // Looking at the view_file, the input is UNCONTROLLED (no value/onChange prop).
+                            // We should probably make it controlled or just accept the transcript for now.
+                            // Since this task is about adding the input, we'll assume the user will connect the logic or we can try to find the input element.
+                            const input = document.querySelector('input[placeholder="Search your library..."]') as HTMLInputElement;
+                            if (input) {
+                                input.value = text;
+                                // Dispatch input event to trigger any potential listeners (though none here)
+                                input.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                        }} />
+                    </div>
                 </div>
 
                 {/* Books Grid */}

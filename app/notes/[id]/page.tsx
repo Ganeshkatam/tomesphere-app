@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Trash2, Mic } from 'lucide-react';
+import VoiceInput from '@/components/ui/VoiceInput';
 import dynamic from 'next/dynamic';
 
 // Import Quill dynamically to avoid SSR issues
@@ -214,19 +215,25 @@ export default function NoteEditorPage() {
                         <label className="block text-sm font-medium text-white mb-2">
                             Title
                         </label>
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Enter note title..."
-                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 text-lg font-semibold"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="Enter note title..."
+                                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 text-lg font-semibold"
+                            />
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                <VoiceInput onTranscript={setTitle} />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Rich Text Editor */}
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-white mb-2">
+                        <label className="block text-sm font-medium text-white mb-2 flex items-center justify-between">
                             Content
+                            <VoiceInput onTranscript={(text) => setContent(prev => prev + ' ' + text)} />
                         </label>
                         <div className="bg-white rounded-xl overflow-hidden">
                             <ReactQuill

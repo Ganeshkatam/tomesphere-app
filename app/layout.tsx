@@ -10,7 +10,7 @@ import InstallPWA from "@/components/InstallPWA";
 import PWAUpdatePrompt from "@/components/PWAUpdatePrompt";
 import QuickAccessSidebar from "@/components/QuickAccessSidebar";
 import { usePathname } from "next/navigation";
-import GakaVoiceListenerWeb from '@/components/GakaVoiceListenerWeb';
+import { Toaster } from 'react-hot-toast';
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
 import { PWAProvider } from "@/lib/pwa-context";
 
@@ -84,7 +84,7 @@ export default function RootLayout({
             <PWAUpdatePrompt />
             <QuickAccessSidebar />
           </ThemeProvider>
-          <GakaVoiceListenerWeb />
+          {/* Global Components */}
         </PWAProvider>
       </body>
     </html>

@@ -75,9 +75,9 @@ export async function getLiveAnalytics(): Promise<AnalyticsSnapshot> {
 
         return {
             activeUsers: activeUsers || 0,
-            activeReadings: 0, // Will be implemented with reading_sessions table
+            activeReadings: 0, // Pending integration
             signupsToday: signupsToday || 0,
-            booksViewedToday: 0, // Will be implemented with view tracking
+            booksViewedToday: 0, // View tracking not yet implemented
             totalBooks: totalBooks || 0,
             totalUsers: totalUsers || 0,
             newBooksThisWeek: newBooksThisWeek || 0,
@@ -171,7 +171,7 @@ export async function getGenreDistribution(): Promise<GenreDistribution[]> {
 }
 
 /**
- * Get popular books (by featured status for now)
+ * Get popular books (by featured status for now, enriched with real like counts)
  */
 export async function getPopularBooks(limit: number = 10): Promise<PopularBook[]> {
     try {
@@ -183,11 +183,20 @@ export async function getPopularBooks(limit: number = 10): Promise<PopularBook[]
 
         if (!books) return [];
 
-        return books.map(book => ({
-            ...book,
-            views: 0, // Will implement view tracking
-            likes: 0, // Will implement like tracking
+        const booksWithStats = await Promise.all(books.map(async (book) => {
+            const { count } = await supabase
+                .from('likes')
+                .select('*', { count: 'exact', head: true })
+                .eq('book_id', book.id);
+
+            return {
+                ...book,
+                views: 0, // View tracking not yet implemented
+                likes: count || 0,
+            };
         }));
+
+        return booksWithStats.sort((a, b) => b.likes - a.likes);
     } catch (error) {
         console.error('Error fetching popular books:', error);
         return [];
@@ -198,10 +207,39 @@ export async function getPopularBooks(limit: number = 10): Promise<PopularBook[]
  * Get reading activity by hour (for heatmap)
  */
 export async function getActivityByHour(): Promise<{ hour: number; activity: number }[]> {
-    // This will be implemented when we have reading_sessions table
-    // For now, return mock data structure
-    return Array.from({ length: 24 }, (_, i) => ({
-        hour: i,
-        activity: Math.floor(Math.random() * 100), // Mock data
-    }));
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Fetch sessions started today
+        const { data: sessions } = await supabase
+            .from('reading_sessions')
+            .select('started_at')
+            .gte('started_at', today.toISOString());
+
+        // Initialize 24h counters
+        const activityByHour = Array.from({ length: 24 }, (_, i) => ({
+            hour: i,
+            activity: 0
+        }));
+
+        if (sessions) {
+            sessions.forEach(session => {
+                const date = new Date(session.started_at);
+                const hour = date.getHours(); // Local time hour (0-23)
+                if (hour >= 0 && hour < 24) {
+                    activityByHour[hour].activity += 1;
+                }
+            });
+        }
+
+        return activityByHour;
+    } catch (error) {
+        console.error('Error fetching activity by hour:', error);
+        // Return zeros on error to prevent UI crash
+        return Array.from({ length: 24 }, (_, i) => ({
+            hour: i,
+            activity: 0,
+        }));
+    }
 }

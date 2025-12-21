@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { generateSimpleDescription } from '@/lib/pdf-description-generator';
 import { Sparkles } from 'lucide-react';
 import { logAdminAction } from '@/lib/audit';
+import VoiceInput from '@/components/ui/VoiceInput';
 
 interface BookUploadFormProps {
     onBookAdded: () => void;
@@ -250,13 +251,18 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
                     <label className="block text-sm font-medium mb-2 text-slate-300">
                         Title *
                     </label>
-                    <input
-                        type="text"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        required
-                        className="w-full"
-                    />
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            required
+                            className="w-full pr-12"
+                        />
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <VoiceInput onTranscript={(text) => setFormData({ ...formData, title: text })} />
+                        </div>
+                    </div>
                 </div>
 
                 <div>
@@ -367,13 +373,18 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
                         {generatingDescription ? 'Generating...' : 'Auto-Generate'}
                     </button>
                 </div>
-                <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={4}
-                    className="w-full"
-                    placeholder="Brief description of the book..."
-                />
+                <div className="relative">
+                    <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        rows={4}
+                        className="w-full pr-12"
+                        placeholder="Brief description of the book..."
+                    />
+                    <div className="absolute right-2 top-3">
+                        <VoiceInput onTranscript={(text) => setFormData({ ...formData, description: formData.description ? formData.description + ' ' + text : text })} />
+                    </div>
+                </div>
             </div>
 
             {/* File Uploads Section */}

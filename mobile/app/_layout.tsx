@@ -10,7 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { supabase } from '@/lib/supabase';
-import MobileVoiceListener from '@/components/MobileVoiceListener';
+
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -81,7 +81,7 @@ function RootLayoutNav() {
             <Stack.Screen name="book/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
-          <MobileVoiceListener />
+
         </ThemeProvider>
       </ErrorBoundary>
     </GestureHandlerRootView>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, getCurrentUser, Profile } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
-import VoiceInput from '@/components/VoiceInput';
+
 import MFASetup from '@/components/MFASetup';
 import toast, { Toaster } from 'react-hot-toast';
 import {
@@ -12,6 +12,7 @@ import {
     Linkedin, Twitter, Github, Lock, Bell, Eye, Target, BarChart3, Camera, Upload, Clock,
     Users, UserPlus, UserMinus, User, Mail, Phone, Calendar, Edit2, MessageSquare
 } from 'lucide-react';
+import VoiceInput from '@/components/ui/VoiceInput';
 
 export default function ProfilePage() {
     const [user, setUser] = useState<any>(null);
@@ -385,11 +386,11 @@ export default function ProfilePage() {
                                             value={formData.bio}
                                             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                                             rows={4}
-                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white resize-none focus:outline-none focus:border-indigo-500"
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 pr-12 text-white resize-none focus:outline-none focus:border-indigo-500"
                                             placeholder="Tell us about yourself..."
                                         />
-                                        <div className="absolute right-2 bottom-2">
-                                            <VoiceInput onTranscript={(text) => setFormData({ ...formData, bio: formData.bio + ' ' + text })} />
+                                        <div className="absolute right-2 top-2">
+                                            <VoiceInput onTranscript={(text) => setFormData(prev => ({ ...prev, bio: prev.bio ? prev.bio + ' ' + text : text }))} />
                                         </div>
                                     </div>
                                 </div>

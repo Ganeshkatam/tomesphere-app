@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
-import VoiceInput from '@/components/VoiceInput';
+
 import { ArrowLeft, DollarSign, Book, Heart, ShoppingBag } from 'lucide-react';
+import VoiceInput from '@/components/ui/VoiceInput';
 
 interface Listing {
     id: string;
@@ -118,15 +119,17 @@ export default function TextbookExchangePage() {
                 </div>
 
                 {/* Search */}
-                <div className="mb-6 flex gap-2">
+                <div className="mb-6 flex gap-2 relative">
                     <input
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search by title or author..."
-                        className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-green-500/50"
+                        className="flex-1 px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-green-500/50"
                     />
-                    <VoiceInput onTranscript={(text) => setSearchTerm(text)} />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <VoiceInput onTranscript={setSearchTerm} />
+                    </div>
                 </div>
 
                 {/* Condition Filter */}

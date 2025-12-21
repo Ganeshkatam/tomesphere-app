@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, Profile } from '@/lib/supabase';
 import toast from 'react-hot-toast';
+import VoiceInput from '@/components/ui/VoiceInput';
 
 export default function UserManagement() {
     const [users, setUsers] = useState<Profile[]>([]);
@@ -59,6 +60,42 @@ export default function UserManagement() {
             u.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        name: '',
+        role: 'user'
+    });
+
+    const handleCreateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const loadingToast = toast.loading('Creating user...');
+
+        try {
+            const response = await fetch('/api/admin/create-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error);
+            }
+
+            toast.dismiss(loadingToast);
+            toast.success('User created successfully!');
+            setShowCreateModal(false);
+            setFormData({ email: '', password: '', name: '', role: 'user' });
+            fetchUsers(); // Refresh list
+        } catch (error: any) {
+            toast.dismiss(loadingToast);
+            toast.error(error.message || 'Failed to create user');
+        }
+    };
+
     if (loading) {
         return <div className="spinner mx-auto" />;
     }
@@ -73,16 +110,111 @@ export default function UserManagement() {
                     <p className="text-slate-400">Total Members: <span className="text-white font-semibold">{users.length}</span></p>
                 </div>
 
-                <div className="relative w-full md:w-72 group">
-                    <input
-                        type="text"
-                        placeholder="Search users..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-slate-800/50 border border-white/10 rounded-xl pl-4 pr-4 py-3 text-white focus:outline-none focus:border-indigo-500/50 focus:bg-slate-800 transition-all placeholder:text-slate-500 glass"
-                    />
+                <div className="flex gap-4 items-center">
+                    <button
+                        onClick={() => setShowCreateModal(true)}
+                        className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+                    >
+                        <span>+</span> Add User
+                    </button>
+                    <div className="relative w-full md:w-72 group">
+                        <input
+                            type="text"
+                            placeholder="Search users..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full bg-slate-800/50 border border-white/10 rounded-xl pl-4 pr-12 py-3 text-white focus:outline-none focus:border-indigo-500/50 focus:bg-slate-800 transition-all placeholder:text-slate-500 glass"
+                        />
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <VoiceInput onTranscript={setSearchTerm} />
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* Create User Modal */}
+            {showCreateModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-scale-in">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-bold text-white">Add New User</h3>
+                            <button
+                                onClick={() => setShowCreateModal(false)}
+                                className="text-slate-400 hover:text-white transition-colors"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <form onSubmit={handleCreateUser} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Full Name</label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        required
+                                        value={formData.name}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 pr-12 text-white focus:border-indigo-500/50 focus:outline-none"
+                                        placeholder="John Doe"
+                                    />
+                                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                        <VoiceInput onTranscript={(text) => setFormData(prev => ({ ...prev, name: text }))} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Email Address</label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:border-indigo-500/50 focus:outline-none"
+                                    placeholder="john@example.com"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Password</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={formData.password}
+                                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:border-indigo-500/50 focus:outline-none"
+                                    placeholder="Minimum 6 characters"
+                                    minLength={6}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Role</label>
+                                <select
+                                    value={formData.role}
+                                    onChange={e => setFormData({ ...formData, role: e.target.value })}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:border-indigo-500/50 focus:outline-none"
+                                >
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCreateModal(false)}
+                                    className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl font-medium transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors"
+                                >
+                                    Create User
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             <div className="space-y-3">
                 {filteredUsers.map((user, index) => (

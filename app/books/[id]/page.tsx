@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase, Book, getCurrentUser } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
@@ -8,10 +8,21 @@ import toast, { Toaster } from 'react-hot-toast';
 import { ArrowLeft, BookOpen, Heart } from 'lucide-react';
 import { generateSimpleDescription } from '@/lib/pdf-description-generator';
 
-export default function BookDetailPage() {
-    const params = useParams();
+export default function BookDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    // const params = useParams(); // useParams is for Client Components, but page props are passed directly. 
+    // However, useParams() is also valid in Client Components. 
+    // The issue reported was accessing `params` prop directly without unwrapping.
+    // Since this is a Client Component ('use client'), `params` prop is available but is a promise in Next.js 15.
+
+    // Actually, for 'use client' components, useParams() hook is the recommended way if we don't want to deal with Promise props.
+    // But since the Page component receives `params` prop, Next.js expects us to handle it if we define it.
+    // The previous error was specifically about accessing props.params. 
+
+    // Let's stick to the pattern we used in ChatPage: use(params)
+
+    const { id } = use(params);
     const router = useRouter();
-    const bookId = params.id as string;
+    const bookId = id;
 
     const [book, setBook] = useState<Book | null>(null);
     const [user, setUser] = useState<any>(null);
@@ -30,7 +41,7 @@ export default function BookDetailPage() {
 
     useEffect(() => {
         loadBookDetails();
-    }, [params.id]);
+    }, [bookId]);
 
     const loadBookDetails = async () => {
         try {
@@ -41,7 +52,7 @@ export default function BookDetailPage() {
             const { data: bookData, error: bookError } = await supabase
                 .from('books')
                 .select('*')
-                .eq('id', params.id)
+                .eq('id', bookId)
                 .single();
 
             if (bookError) throw bookError;
@@ -204,6 +215,45 @@ export default function BookDetailPage() {
                     <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
                     <span className="font-medium">Back</span>
                 </button>
+
+                {/* Admin Actions Shortcut */}
+                {user?.role === 'admin' && (
+                    <div className="mb-8 p-4 glass-strong rounded-xl border border-indigo-500/30 flex items-center justify-between animate-fadeIn">
+                        <div className="flex items-center gap-3">
+                            <span className="bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-lg text-sm font-bold border border-indigo-500/30">
+                                👑 Admin Mode
+                            </span>
+                            <span className="text-slate-300 text-sm">You have manage access to this book.</span>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => router.push('/admin')}
+                                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors border border-white/10"
+                            >
+                                Manage in Dashboard
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    if (!confirm('Are you sure you want to delete this book? This cannot be undone.')) return;
+                                    try {
+                                        toast.loading('Deleting book...');
+                                        const { error } = await supabase.from('books').delete().eq('id', book.id);
+                                        if (error) throw error;
+                                        toast.dismiss();
+                                        toast.success('Book deleted');
+                                        router.push('/admin');
+                                    } catch (e) {
+                                        toast.dismiss();
+                                        toast.error('Failed to delete book');
+                                    }
+                                }}
+                                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-lg text-sm font-medium transition-colors border border-red-500/20"
+                            >
+                                Delete Book
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Book Header */}
                 <div className="grid md:grid-cols-[300px_1fr] gap-8 mb-12 animate-fadeIn">

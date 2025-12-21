@@ -328,7 +328,7 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url('/library-bg.jpeg');
+  background-image: linear-gradient(to bottom right, #0f172a, #1e293b);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

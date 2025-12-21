@@ -11,7 +11,8 @@ import Navbar from '@/components/Navbar';
 import BookCard from '@/components/BookCard';
 import toast, { Toaster } from 'react-hot-toast';
 import { FadeIn, SlideUp, StaggerContainer, StaggerItem } from '@/components/ui/motion';
-import { Search, Filter, BookOpen, Flame, Sparkles, Download, X, Mic } from 'lucide-react';
+import { Search, Filter, BookOpen, Flame, Sparkles, Download, X } from 'lucide-react';
+import VoiceInput from '@/components/ui/VoiceInput';
 import OnboardingTour from '@/components/OnboardingTour';
 
 // Lazy load heavy components for better performance
@@ -45,16 +46,22 @@ export default function HomePage() {
     const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
     const [recommendations, setRecommendations] = useState<Book[]>([]);
     const [trendingBooks, setTrendingBooks] = useState<Book[]>([]);
+
+    // Search States
     const [searchTerm, setSearchTerm] = useState('');
-    const [searchQuery, setSearchQuery] = useState(''); // Hero search
-    const [genreSearch, setGenreSearch] = useState(''); // Genre search
+    const [searchQuery, setSearchQuery] = useState(''); // Hero search input
+    const [genreSearch, setGenreSearch] = useState(''); // Sticky search input
+
     const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
     const [genres, setGenres] = useState<string[]>([]);
-    const [genresToShow, setGenresToShow] = useState(15); // Show first 15 genres
+    const [genresToShow, setGenresToShow] = useState(15);
     const [userLikes, setUserLikes] = useState<Set<string>>(new Set());
     const [userRatings, setUserRatings] = useState<Map<string, number>>(new Map());
     const [activeTab, setActiveTab] = useState<'all' | 'trending' | 'recommended'>('all');
-    const [loading, setLoading] = useState(true);
+
+    // Loading States
+    const [initialLoading, setInitialLoading] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
 
     // Personalized collections
     const [wantToReadBooks, setWantToReadBooks] = useState<Book[]>([]);
@@ -79,194 +86,178 @@ export default function HomePage() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Sync Search Inputs
     useEffect(() => {
-        filterBooks();
-    }, [searchTerm, selectedGenres, books, activeTab]);
+        if (searchQuery !== searchTerm && searchQuery !== '') {
+            // Debounced update handled by separate effect on searchTerm? 
+            // No, we need to update searchTerm from inputs
+        }
+    }, [searchQuery]);
 
-    const initializePage = async () => {
+    // Dynamic Book Fetching
+    const fetchBooks = async (search: string, genreFilters: string[]) => {
+        // Silent reload check: If clearing everything, don't show spinner
+        const isClearing = !search && genreFilters.length === 0;
+
+        if (!isClearing) {
+            setIsSearching(true);
+        }
+
         try {
-            console.log('Home page: Checking authentication...');
+            let query = supabase
+                .from('books')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-            // Check for session directly
-            const { data: { session } } = await supabase.auth.getSession();
-
-            if (session?.user) {
-                console.log('Home page: User logged in:', session.user.email);
-                setUser(session.user);
-            } else {
-                console.log('Home page: No user, showing as guest');
-                // Don't redirect - allow guest browsing
+            // Apply Search (Case-insensitive multi-column)
+            if (search.trim()) {
+                query = query.or(`title.ilike.%${search}%,author.ilike.%${search}%,description.ilike.%${search}%`);
             }
 
-            // Fetch books - OPTIMIZED: Load only 20 initially
-            try {
-                const { data: booksData, error: booksError } = await supabase
-                    .from('books')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(20); // Load only 20 books initially
-
-                if (booksError) {
-                    console.warn('Books fetch error:', booksError);
-                } else {
-                    setBooks(booksData || []);
-
-                    // Get unique genres from database
-                    const dbGenres = Array.from(new Set(booksData?.map(b => b.genre).filter(Boolean) || []));
-                    setGenres(dbGenres);
-                }
-            } catch (e) {
-                console.warn('Error fetching books:', e);
+            // Apply Genre Filters
+            if (genreFilters.length > 0) {
+                query = query.in('genre', genreFilters);
             }
 
-            // Fetch user's likes (may not exist yet) - only if logged in
-            if (session?.user) {
-                try {
-                    const { data: likesData } = await supabase
-                        .from('likes')
-                        .select('book_id')
-                        .eq('user_id', session.user.id);
-                    setUserLikes(new Set(likesData?.map(l => l.book_id) || []));
-                } catch (e) {
-                    console.warn('Likes table may not exist:', e);
-                }
+            const { data, error } = await query;
 
-                // Fetch user's ratings (may not exist yet)
-                try {
-                    const { data: ratingsData } = await supabase
-                        .from('ratings')
-                        .select('book_id, rating')
-                        .eq('user_id', session.user.id);
-                    const ratingsMap = new Map();
-                    ratingsData?.forEach(r => ratingsMap.set(r.book_id, r.rating));
-                    setUserRatings(ratingsMap);
-                } catch (e) {
-                    console.warn('Ratings table may not exist:', e);
-                }
+            if (error) throw error;
+            setFilteredBooks(data || []);
 
-                // Generate AI recommendations (skip if fails)
-                try {
-                    if (books.length > 0) {
-                        const aiRecs = await generateAIRecommendations(session.user.id, books);
-                        setRecommendations(aiRecs);
-
-                        const trending = await getTrendingBooks(10);
-                        setTrendingBooks(trending);
-                    }
-                } catch (e) {
-                    console.warn('AI recommendations failed:', e);
-                }
-
-                // Fetch personalized collections
-                try {
-                    // Get reading lists
-                    const { data: readingListData } = await supabase
-                        .from('reading_lists')
-                        .select('book_id, status, books(*)')
-                        .eq('user_id', session.user.id);
-
-                    if (readingListData) {
-                        const wantToRead = readingListData
-                            .filter(item => item.status === 'want_to_read')
-                            .map(item => item.books)
-                            .filter(Boolean)
-                            .slice(0, 4);
-
-                        const currentlyReading = readingListData
-                            .filter(item => item.status === 'currently_reading')
-                            .map(item => item.books)
-                            .filter(Boolean)
-                            .slice(0, 4);
-
-                        setWantToReadBooks(wantToRead as unknown as Book[]);
-                        setCurrentlyReadingBooks(currentlyReading as unknown as Book[]);
-                    }
-
-                    // Get favorite genre from most liked books
-                    const { data: likedBooksData } = await supabase
-                        .from('likes')
-                        .select('book_id, books(genre)')
-                        .eq('user_id', session.user.id);
-
-                    if (likedBooksData && likedBooksData.length > 0) {
-                        // Find most common genre
-                        const genreCounts: { [key: string]: number } = {};
-                        likedBooksData.forEach((item: any) => {
-                            const genre = item.books?.genre;
-                            if (genre) genreCounts[genre] = (genreCounts[genre] || 0) + 1;
-                        });
-
-                        const favGenre = Object.entries(genreCounts)
-                            .sort(([, a], [, b]) => b - a)[0]?.[0] || '';
-
-                        // Get books from favorite genre
-                        if (favGenre) {
-                            const { data: genreBooks } = await supabase
-                                .from('books')
-                                .select('*')
-                                .eq('genre', favGenre)
-                                .limit(4);
-
-                            setFavoriteGenreBooks(genreBooks || []);
-                        }
-
-                        // Get recommendations based on liked books (same genres)
-                        const likedGenres = Array.from(new Set(likedBooksData.map((item: any) => item.books?.genre).filter(Boolean)));
-                        if (likedGenres.length > 0) {
-                            const { data: similarBooks } = await supabase
-                                .from('books')
-                                .select('*')
-                                .in('genre', likedGenres)
-                                .limit(8);
-
-                            // Filter out already liked books
-                            const likedIds = new Set(likedBooksData.map(item => item.book_id));
-                            const filteredSimilar = similarBooks?.filter(book => !likedIds.has(book.id)) || [];
-                            setLikedBooksRecs(filteredSimilar.slice(0, 4));
-                        }
-
-                        setUserStats({
-                            totalLikes: likedBooksData.length,
-                            favoriteGenre: favGenre
-                        });
-                    }
-                } catch (e) {
-                    console.warn('Error fetching personalized collections:', e);
-                }
+            // Initial data population & Silent Reset
+            if (isClearing) {
+                setBooks(data?.slice(0, 20) || []);
+                // If we were clearing, we just updated the data 'silently' (no spinner was shown)
             }
-
-            setLoading(false);
         } catch (error) {
-            console.error('Error initializing page:', error);
-            toast.error('Some features may not work properly');
-            setLoading(false);
+            console.error('Error fetching books:', error);
+            toast.error('Failed to search books');
+        } finally {
+            setIsSearching(false);
+            setInitialLoading(false);
         }
     };
 
-    const filterBooks = () => {
-        let filtered = books;
+    // Live Search Effect (Debounced)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchBooks(searchTerm, selectedGenres);
+        }, 300);
 
-        // Tab-based filtering
-        if (activeTab === 'recommended') {
-            filtered = recommendations;
-        } else if (activeTab === 'trending') {
-            filtered = trendingBooks;
+        return () => clearTimeout(timer);
+    }, [searchTerm, selectedGenres]);
+
+    const initializePage = async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session?.user) {
+                setUser(session.user);
+                await fetchPersonalizedData(session.user.id);
+            }
+            // Trigger initial fetch
+            fetchBooks('', []);
+        } catch (error) {
+            console.error('Error initializing page:', error);
+            setInitialLoading(false);
+        }
+    };
+
+    // Sort genres: Selected first, then alphabetical
+    const sortedGenres = [...getAllGenres()].sort((a, b) => {
+        const isSelectedA = selectedGenres.includes(a);
+        const isSelectedB = selectedGenres.includes(b);
+        if (isSelectedA && !isSelectedB) return -1;
+        if (!isSelectedA && isSelectedB) return 1;
+        return a.localeCompare(b);
+    });
+
+    const fetchPersonalizedData = async (userId: string) => {
+        try {
+            // Fetch user's likes
+            const { data: likesData } = await supabase
+                .from('likes')
+                .select('book_id')
+                .eq('user_id', userId);
+            setUserLikes(new Set(likesData?.map(l => l.book_id) || []));
+
+            // Fetch user's ratings
+            const { data: ratingsData } = await supabase
+                .from('ratings')
+                .select('book_id, rating')
+                .eq('user_id', userId);
+            const ratingsMap = new Map();
+            ratingsData?.forEach(r => ratingsMap.set(r.book_id, r.rating));
+            setUserRatings(ratingsMap);
+
+            // Generate AI recommendations
+            // Note: We need some books loaded to generate recs locally, 
+            // or move this to server-side too. For now, we'll fetch a batch.
+            const { data: allBooks } = await supabase.from('books').select('*').limit(50);
+            if (allBooks) {
+                const aiRecs = await generateAIRecommendations(userId, allBooks);
+                setRecommendations(aiRecs);
+                const trending = await getTrendingBooks(10);
+                setTrendingBooks(trending);
+            }
+
+            // Reading Lists & Favorite Genres
+            await fetchReadingListsAndGenres(userId);
+
+        } catch (e) {
+            console.warn('Personalized data error:', e);
+        }
+    };
+
+    const fetchReadingListsAndGenres = async (userId: string) => {
+        // Get reading lists
+        const { data: readingListData } = await supabase
+            .from('reading_lists')
+            .select('book_id, status, books(*)')
+            .eq('user_id', userId);
+
+        if (readingListData) {
+            const wantToRead = readingListData
+                .filter(item => item.status === 'want_to_read')
+                .map(item => item.books)
+                .filter(Boolean)
+                .slice(0, 4);
+
+            const currentlyReading = readingListData
+                .filter(item => item.status === 'currently_reading')
+                .map(item => item.books)
+                .filter(Boolean)
+                .slice(0, 4);
+
+            setWantToReadBooks(wantToRead as unknown as Book[]);
+            setCurrentlyReadingBooks(currentlyReading as unknown as Book[]);
         }
 
-        // Search filtering
-        if (searchTerm) {
-            filtered = filtered.filter(book =>
-                book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                book.author.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        }
+        // Get favorite genre from most liked books
+        const { data: likedBooksData } = await supabase
+            .from('likes')
+            .select('book_id, books(genre)')
+            .eq('user_id', userId);
 
-        // Multi-genre filtering
-        if (selectedGenres.length > 0) {
-            filtered = filtered.filter(book => selectedGenres.includes(book.genre));
-        }
+        if (likedBooksData && likedBooksData.length > 0) {
+            const genreCounts: { [key: string]: number } = {};
+            likedBooksData.forEach((item: any) => {
+                const genre = item.books?.genre;
+                if (genre) genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+            });
 
-        setFilteredBooks(filtered);
+            const favGenre = Object.entries(genreCounts)
+                .sort(([, a], [, b]) => b - a)[0]?.[0] || '';
+
+            if (favGenre) {
+                const { data: genreBooks } = await supabase
+                    .from('books')
+                    .select('*')
+                    .eq('genre', favGenre)
+                    .limit(4);
+                setFavoriteGenreBooks(genreBooks || []);
+            }
+        }
     };
 
     const handleLike = async (bookId: string) => {
@@ -406,7 +397,7 @@ export default function HomePage() {
         toast.success('PDF downloaded!');
     };
 
-    if (loading) {
+    if (initialLoading) {
         return (
             <div className="min-h-screen bg-gradient-page flex items-center justify-center">
                 <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -429,10 +420,12 @@ export default function HomePage() {
                                 <input
                                     type="text"
                                     value={genreSearch}
-                                    onChange={(e) => setGenreSearch(e.target.value)}
+                                    onChange={(e) => {
+                                        setGenreSearch(e.target.value);
+                                        setSearchTerm(e.target.value); // Live search
+                                    }}
                                     onKeyPress={(e) => {
                                         if (e.key === 'Enter') {
-                                            setSearchTerm(genreSearch);
                                             const booksSection = document.getElementById('all-books-section');
                                             if (booksSection) booksSection.scrollIntoView({ behavior: 'smooth' });
                                         }
@@ -443,14 +436,24 @@ export default function HomePage() {
                                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
-                                {genreSearch && (
+                                {(genreSearch || searchTerm) && (
                                     <button
-                                        onClick={() => setGenreSearch('')}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm"
+                                        onClick={() => {
+                                            setGenreSearch('');
+                                            setSearchTerm('');
+                                        }}
+                                        className="text-slate-400 hover:text-white text-sm mr-1"
                                     >
                                         ✕
                                     </button>
                                 )}
+                                <VoiceInput
+                                    onTranscript={(text) => {
+                                        setGenreSearch(text);
+                                        setSearchTerm(text);
+                                    }}
+                                    className="p-1"
+                                />
                             </div>
 
                             <div className="relative">
@@ -486,7 +489,6 @@ export default function HomePage() {
 
                             <button
                                 onClick={() => {
-                                    setSearchTerm(genreSearch);
                                     const booksSection = document.getElementById('all-books-section');
                                     if (booksSection) booksSection.scrollIntoView({ behavior: 'smooth' });
                                 }}
@@ -495,7 +497,7 @@ export default function HomePage() {
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
-                                Search
+                                {isSearching ? 'Searching...' : 'Search'}
                             </button>
                         </div>
                     </div>
@@ -507,7 +509,7 @@ export default function HomePage() {
                 {/* Background Gradients */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-[2000px] pointer-events-none">
                     <div className="absolute top-20 left-10 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] mix-blend-screen animate-pulse" style={{ animationDuration: '4s' }} />
-                    <div className="absolute top-40 right-10 w-[400px] h-[400px] bg-secondary/20 rounded-full blur-[100px] mix-blend-screen animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+                    <div className="absolute top-40 right-10 w-[400px] h-[400px] bg-secondary/20 rounded-full blur-300px mix-blend-screen animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
                 </div>
 
                 <div className="w-full max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -545,48 +547,29 @@ export default function HomePage() {
                                         <input
                                             type="text"
                                             value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            onChange={(e) => {
+                                                setSearchQuery(e.target.value);
+                                                setSearchTerm(e.target.value); // Live search
+                                            }}
                                             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                             placeholder="Search titles, authors, or topics..."
                                             className="w-full h-14 pl-14 pr-14 bg-white/5 border border-white/5 rounded-xl text-lg text-white placeholder-slate-500 focus:outline-none focus:bg-white/10 focus:border-primary/50 transition-all"
                                         />
-                                        {/* Microphone Button */}
-                                        <button
-                                            onClick={() => {
-                                                // Voice search functionality
-                                                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                                                    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-                                                    const recognition = new SpeechRecognition();
-                                                    recognition.lang = 'en-US';
-                                                    recognition.continuous = false;
-                                                    recognition.interimResults = false;
-
-                                                    recognition.onresult = (event: any) => {
-                                                        const transcript = event.results[0][0].transcript;
-                                                        setSearchQuery(transcript);
-                                                        setSearchTerm(transcript);
-                                                    };
-
-                                                    recognition.onerror = (event: any) => {
-                                                        console.error('Speech recognition error:', event.error);
-                                                    };
-
-                                                    recognition.start();
-                                                } else {
-                                                    alert('Voice search is not supported in your browser. Please use Chrome, Edge, or Safari.');
-                                                }
-                                            }}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-primary transition-all group/mic"
-                                            title="Voice search"
-                                        >
-                                            <Mic size={20} className="group-hover/mic:scale-110 transition-transform" />
-                                        </button>
+                                        {/* Voice Input */}
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                            <VoiceInput
+                                                onTranscript={(text) => {
+                                                    setSearchQuery(text);
+                                                    setSearchTerm(text);
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                     <button
                                         onClick={handleSearch}
-                                        className="h-14 px-8 btn-primary text-lg font-semibold shadow-glow hover:shadow-glow-lg active:scale-95 whitespace-nowrap"
+                                        className="h-14 px-8 btn-primary text-lg font-semibold shadow-glow hover:shadow-glow-lg active:scale-95 whitespace-nowrap min-w-[140px] flex items-center justify-center"
                                     >
-                                        Explore
+                                        {isSearching ? <div className="spinner w-6 h-6 border-white" /> : 'Explore'}
                                     </button>
                                 </div>
                             </div>
@@ -601,7 +584,15 @@ export default function HomePage() {
                                         <input
                                             type="text"
                                             value={genreSearch}
-                                            onChange={(e) => setGenreSearch(e.target.value)}
+                                            onChange={(e) => {
+                                                setGenreSearch(e.target.value);
+                                                // Only update searchTerm if this is being used as a main search
+                                                // But sticky search uses this. The genre section search is just for filtering genres?
+                                                // Wait, line 402 says "Search genres or books..."
+                                                // This input is in the "genre-section". 
+                                                // Let's keep this as GENRE filtering only, based on placeholder "Search and select genres..."
+                                                // The STICKY search (Line 394 above) is the one for books.
+                                            }}
                                             placeholder="Search and select genres..."
                                             className="w-full px-4 py-3 pl-10 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 focus:bg-white/10 transition-all"
                                         />
@@ -659,7 +650,7 @@ export default function HomePage() {
                                     <p className="text-base text-slate-300 font-semibold">📚 {selectedGenres.length > 0 ? `${selectedGenres.length} genre${selectedGenres.length > 1 ? 's' : ''} selected` : `Browse by Genre`}</p>
                                 </div>
                                 <div className="flex flex-wrap justify-center gap-3 max-w-5xl mx-auto mb-4">
-                                    {getAllGenres().filter(g => g.toLowerCase().includes(genreSearch.toLowerCase())).slice(0, genresToShow).map((genre) => {
+                                    {sortedGenres.filter(g => g.toLowerCase().includes(genreSearch.toLowerCase())).slice(0, genresToShow).map((genre) => {
                                         const isSelected = selectedGenres.includes(genre);
                                         const { icon } = getGenreConfig(genre);
                                         return (

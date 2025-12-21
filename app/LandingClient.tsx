@@ -7,9 +7,10 @@ import { supabase } from '@/lib/supabase';
 import { FadeIn, SlideUp, ScaleIn, StaggerContainer, StaggerItem } from '@/components/ui/motion';
 import toast, { Toaster } from 'react-hot-toast';
 import ALL_GENRES from '@/lib/genres';
-import VoiceInput from '@/components/VoiceInput';
+
 import { Menu, X } from 'lucide-react';
 import BookCard from '@/components/BookCard'; // 1. Import BookCard
+import VoiceInput from '@/components/ui/VoiceInput';
 
 // Lazy load heavy components
 const AuthGateModal = dynamic(() => import('@/components/AuthGateModal'), { ssr: false });
@@ -119,17 +120,6 @@ export default function LandingClient() {
         setPopularBooks(books);
       }
 
-      // Fetch ALL books for the "All Available Books" section
-      const { data: allBooksData, error: allBooksError } = await supabase
-        .from('books')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (allBooksError) throw allBooksError;
-      if (allBooksData) {
-        setAllBooks(allBooksData);
-      }
-
       // Fetch stats
       const { count: bookCount, error: bookCountError } = await supabase.from('books').select('*', { count: 'exact', head: true });
       if (bookCountError) throw bookCountError;
@@ -168,67 +158,77 @@ export default function LandingClient() {
     setSearchOrigin(null);
   };
 
-  // Filter books based on selected genres and search query
-  const filteredBooks = allBooks.filter(book => {
-    // 1. Text Search Filter (Title/Author/Genre)
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const matchesTitle = book.title?.toLowerCase().includes(query);
-      const matchesAuthor = book.author?.toLowerCase().includes(query);
-      const matchesGenre = book.genre?.toLowerCase().includes(query);
-      if (!matchesTitle && !matchesAuthor && !matchesGenre) return false;
-    }
-
-    // 2. Genre Filter (if selected)
-    if (selectedGenres.length > 0) {
-      if (!book.genre) return false;
-      const bookGenre = book.genre.toLowerCase().trim();
-      return selectedGenres.some(genre => {
-        const selectedGenre = genre.toLowerCase().trim();
-        return bookGenre === selectedGenre ||
-          bookGenre.includes(selectedGenre) ||
-          selectedGenre.includes(bookGenre);
-      });
-    }
-
-    return true;
+  // Genre Search Logic
+  const sortedGenres = [...genres].sort((a, b) => {
+    const isSelectedA = selectedGenres.includes(a);
+    const isSelectedB = selectedGenres.includes(b);
+    if (isSelectedA && !isSelectedB) return -1;
+    if (!isSelectedA && isSelectedB) return 1;
+    return a.localeCompare(b);
   });
+
+  // Dynamic Book Fetching (Server-Side)
+  // Replaces client-side filteredBooks logic
+  const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const fetchBooks = async (search: string, genreFilters: string[]) => {
+    // Silent reload check
+    const isClearing = !search && genreFilters.length === 0;
+
+    if (!isClearing) {
+      setIsSearching(true);
+    }
+
+    try {
+      let query = supabase
+        .from('books')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      // Apply Search (Case-insensitive multi-column)
+      if (search.trim()) {
+        query = query.or(`title.ilike.%${search}%,author.ilike.%${search}%,description.ilike.%${search}%`);
+      }
+
+      // Apply Genre Filters
+      if (genreFilters.length > 0) {
+        query = query.in('genre', genreFilters);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setFilteredBooks(data || []);
+    } catch (error: any) {
+      console.error('Error fetching books:', error);
+      toast.error('Failed to search books');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Debounced Search Effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchBooks(searchQuery, selectedGenres);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedGenres]);
 
   useEffect(() => {
     setBooksToShow(10);
     // Scroll to books section when filters change
-    if (selectedGenres.length > 0) {
+    if (selectedGenres.length > 0 || searchQuery) {
       setTimeout(() => {
         const booksSection = document.getElementById('all-books-section');
         if (booksSection) {
           booksSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      }, 100);
+      }, 500); // Slight delay for data load
     }
-    console.log('Selected genres:', selectedGenres);
-    console.log('Filtered books count:', selectedGenres.length > 0
-      ? allBooks.filter(book => {
-        // 1. Text Search Filter (Title/Author)
-        if (searchQuery) {
-          const query = searchQuery.toLowerCase();
-          const matchesTitle = book.title?.toLowerCase().includes(query);
-          const matchesAuthor = book.author?.toLowerCase().includes(query);
-          const matchesGenre = book.genre?.toLowerCase().includes(query);
-          if (!matchesTitle && !matchesAuthor && !matchesGenre) return false;
-        }
-
-        // 2. Genre Filter
-        if (!book.genre) return false;
-        const bookGenre = book.genre.toLowerCase().trim();
-        return selectedGenres.some(genre => {
-          const selectedGenre = genre.toLowerCase().trim();
-          return bookGenre === selectedGenre ||
-            bookGenre.includes(selectedGenre) ||
-            selectedGenre.includes(bookGenre);
-        });
-      }).length
-      : allBooks.length);
-  }, [selectedGenres, allBooks, searchQuery]);
+  }, [selectedGenres, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gradient-page relative w-full max-w-full mx-auto overflow-x-hidden">
@@ -257,19 +257,25 @@ export default function LandingClient() {
                     }
                   }}
                   placeholder="Search title, author, or genre..."
-                  className="w-full px-4 py-2 pl-10 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 focus:bg-white/10 transition-all text-sm"
+                  className="w-full px-4 py-2 pl-10 pr-20 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 focus:bg-white/10 transition-all text-sm"
                 />
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm"
-                  >
-                    ✕
-                  </button>
-                )}
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="text-slate-400 hover:text-white text-sm p-1"
+                    >
+                      ✕
+                    </button>
+                  )}
+                  <VoiceInput
+                    onTranscript={(text) => setSearchQuery(text)}
+                    className="p-1"
+                  />
+                </div>
               </div>
 
               {/* Genre Dropdown Selector - Popular & Student-Friendly */}
@@ -566,10 +572,13 @@ export default function LandingClient() {
                       className="w-full h-14 pl-14 pr-16 bg-white/5 border border-white/5 rounded-xl text-lg text-white placeholder-slate-500 focus:outline-none focus:bg-white/10 focus:border-primary/50 transition-all font-sans"
                     />
                     {/* Voice Input */}
-                    <div className="absolute inset-y-0 right-2 flex items-center">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
                       <VoiceInput
-                        onTranscript={(text) => setSearchQuery(text)}
-                        className="h-10 w-10"
+                        onTranscript={(text) => {
+                          setSearchQuery(text);
+                          // Optional: Auto-search after a short delay or let user press enter
+                          // For now, we just fill the input
+                        }}
                       />
                     </div>
                   </div>
@@ -680,7 +689,7 @@ export default function LandingClient() {
                   </p>
                 </div>
                 <div className="flex flex-wrap justify-center gap-3 max-w-6xl mx-auto mb-5">
-                  {genres.filter(g => g.toLowerCase().includes(genreSearch.toLowerCase())).slice(0, genresToShow).map((genre) => {
+                  {sortedGenres.filter(g => g.toLowerCase().includes(genreSearch.toLowerCase())).slice(0, genresToShow).map((genre) => {
                     const isSelected = selectedGenres.includes(genre);
 
                     // Genre emoji mapping (same as homepage)

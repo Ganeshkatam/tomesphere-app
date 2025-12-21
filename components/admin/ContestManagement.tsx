@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 import { Plus, Edit2, Trash2, Calendar, Trophy, Users, Search, Filter } from 'lucide-react';
 import ContestForm from './ContestForm';
+import VoiceInput from '@/components/ui/VoiceInput';
 
 export default function ContestManagement() {
     const [contests, setContests] = useState<any[]>([]);
@@ -72,8 +73,11 @@ export default function ContestManagement() {
                             placeholder="Search contests..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-12 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                         />
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <VoiceInput onTranscript={setSearchTerm} />
+                        </div>
                     </div>
                     <select
                         value={statusFilter}
@@ -115,8 +119,8 @@ export default function ContestManagement() {
                                 <div>
                                     <h3 className="font-bold text-white text-lg">{contest.title}</h3>
                                     <div className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide mt-1 ${contest.status === 'active' ? 'bg-green-500/20 text-green-400' :
-                                            contest.status === 'upcoming' ? 'bg-blue-500/20 text-blue-400' :
-                                                'bg-slate-500/20 text-slate-400'
+                                        contest.status === 'upcoming' ? 'bg-blue-500/20 text-blue-400' :
+                                            'bg-slate-500/20 text-slate-400'
                                         }`}>
                                         {contest.status}
                                     </div>

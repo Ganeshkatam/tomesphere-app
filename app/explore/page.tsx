@@ -9,6 +9,7 @@ import BackButton from '@/components/BackButton';
 import toast, { Toaster } from 'react-hot-toast';
 import { FadeIn, SlideUp, StaggerContainer, StaggerItem } from '@/components/ui/motion';
 import { Search, Filter, Globe, ArrowUpDown, X } from 'lucide-react';
+import VoiceInput from '@/components/ui/VoiceInput';
 
 export default function ExplorePage() {
     const router = useRouter();
@@ -109,7 +110,9 @@ export default function ExplorePage() {
 
         // Genre filter
         if (selectedGenre && selectedGenre !== 'All Genres') {
-            filtered = filtered.filter(book => book.genre === selectedGenre);
+            filtered = filtered.filter(book =>
+                (book.genre || '').toLowerCase() === (selectedGenre || '').toLowerCase()
+            );
         }
 
         // Language filter
@@ -208,8 +211,11 @@ export default function ExplorePage() {
                                 placeholder="Search by title, author, or description..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-white focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all placeholder:text-slate-500"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-12 py-3.5 text-white focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all placeholder:text-slate-500"
                             />
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                <VoiceInput onTranscript={setSearchTerm} />
+                            </div>
                         </div>
 
                         {/* Genre Filter */}

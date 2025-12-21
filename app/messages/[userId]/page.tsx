@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import Navbar from '@/components/Navbar';
 import { supabase, DirectMessage, getUserProfile } from '@/lib/supabase';
 import { useRouter } from 'next/navigation'; // Correct import for App Router
 import { MessageSquare, Send, ArrowLeft, User, MoreVertical } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
-export default function ChatPage({ params }: { params: { userId: string } }) {
+export default function ChatPage({ params }: { params: Promise<{ userId: string }> }) {
     const router = useRouter(); // Use the hook
+    const { userId } = use(params);
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [targetUser, setTargetUser] = useState<any>(null);
     const [messages, setMessages] = useState<DirectMessage[]>([]);
@@ -28,14 +29,14 @@ export default function ChatPage({ params }: { params: { userId: string } }) {
 
             try {
                 // Fetch target user profile
-                const profile = await getUserProfile(params.userId);
+                const profile = await getUserProfile(userId);
                 setTargetUser(profile);
 
                 // Fetch existing messages
                 const { data: msgs, error } = await supabase
                     .from('direct_messages')
                     .select('*')
-                    .or(`and(sender_id.eq.${user.id},receiver_id.eq.${params.userId}),and(sender_id.eq.${params.userId},receiver_id.eq.${user.id})`)
+                    .or(`and(sender_id.eq.${user.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${user.id})`)
                     .order('created_at', { ascending: true });
 
                 if (error) throw error;
@@ -48,8 +49,8 @@ export default function ChatPage({ params }: { params: { userId: string } }) {
             }
         };
 
-        if (params.userId) init();
-    }, [params.userId, router]); // Added router to dependency
+        if (userId) init();
+    }, [userId, router]); // Added router to dependency
 
     // Scroll to bottom on new message
     useEffect(() => {
@@ -58,7 +59,7 @@ export default function ChatPage({ params }: { params: { userId: string } }) {
 
     // Real-time Subscription
     useEffect(() => {
-        if (!currentUser || !params.userId) return;
+        if (!currentUser || !userId) return;
 
         const channel = supabase
             .channel('direct_messages')
@@ -71,7 +72,7 @@ export default function ChatPage({ params }: { params: { userId: string } }) {
                     filter: `receiver_id=eq.${currentUser.id}`, // Only listen for incoming
                 },
                 (payload) => {
-                    if (payload.new.sender_id === params.userId) {
+                    if (payload.new.sender_id === userId) {
                         setMessages((prev) => [...prev, payload.new as DirectMessage]);
                     }
                 }
@@ -81,7 +82,7 @@ export default function ChatPage({ params }: { params: { userId: string } }) {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [currentUser, params.userId]);
+    }, [currentUser, userId]);
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -95,7 +96,7 @@ export default function ChatPage({ params }: { params: { userId: string } }) {
         const optimisticMsg: DirectMessage = {
             id: tempId,
             sender_id: currentUser.id,
-            receiver_id: params.userId,
+            receiver_id: userId,
             content: msgContent,
             is_read: false,
             created_at: new Date().toISOString()
@@ -107,7 +108,7 @@ export default function ChatPage({ params }: { params: { userId: string } }) {
                 .from('direct_messages')
                 .insert({
                     sender_id: currentUser.id,
-                    receiver_id: params.userId,
+                    receiver_id: userId,
                     content: msgContent
                 })
                 .select()
@@ -187,8 +188,8 @@ export default function ChatPage({ params }: { params: { userId: string } }) {
                                     >
                                         <div
                                             className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${isMe
-                                                    ? 'bg-pink-600 text-white rounded-br-none shadow-lg shadow-pink-600/10'
-                                                    : 'bg-white/10 text-slate-200 rounded-bl-none border border-white/5'
+                                                ? 'bg-pink-600 text-white rounded-br-none shadow-lg shadow-pink-600/10'
+                                                : 'bg-white/10 text-slate-200 rounded-bl-none border border-white/5'
                                                 }`}
                                         >
                                             {msg.content}

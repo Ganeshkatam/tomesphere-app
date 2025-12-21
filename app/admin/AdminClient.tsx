@@ -10,6 +10,7 @@ import UserManagement from '@/components/admin/UserManagement';
 import ReviewModeration from '@/components/admin/ReviewModeration';
 import AnalyticsDashboard from '@/components/admin/analytics/AnalyticsDashboard';
 import BulkActionsPanel from '@/components/admin/BulkActionsPanel';
+import ActivityLogs from '@/components/admin/ActivityLogs';
 import toast, { Toaster } from 'react-hot-toast';
 import {
     TrendingUp, TrendingDown, Users, BookOpen, Star, Clock,
@@ -17,6 +18,7 @@ import {
     Activity, Zap, Award, ChevronRight, Plus, RefreshCw, Trophy
 } from 'lucide-react';
 import ContestManagement from '@/components/admin/ContestManagement';
+import VoiceInput from '@/components/ui/VoiceInput';
 
 export default function AdminPage() {
     const [user, setUser] = useState<any>(null);
@@ -31,7 +33,7 @@ export default function AdminPage() {
         activeUsers: 0,
         growth: 0,
     });
-    const [activeTab, setActiveTab] = useState<'overview' | 'books' | 'users' | 'reviews' | 'contests'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'books' | 'users' | 'reviews' | 'contests' | 'logs'>('overview');
     const [bookFilter, setBookFilter] = useState<'all' | 'new' | 'featured'>('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [editingBook, setEditingBook] = useState<Book | null>(null);
@@ -93,6 +95,11 @@ export default function AdminPage() {
                 .from('profiles')
                 .select('*', { count: 'exact' });
 
+            // Fetch reviews count
+            const { count: reviewsCount } = await supabase
+                .from('reviews')
+                .select('*', { count: 'exact', head: true });
+
             // Calculate stats
             const genreCounts: { [key: string]: number } = {};
 
@@ -119,7 +126,7 @@ export default function AdminPage() {
                 totalUsers: usersCount || 0,
                 topGenre,
                 recentBooks,
-                totalReviews: 0, // Would need to fetch from reviews table
+                totalReviews: reviewsCount || 0,
                 activeUsers,
                 growth: recentBooks > 0 ? ((recentBooks / (booksData?.length || 1)) * 100) : 0,
             });
@@ -272,6 +279,7 @@ export default function AdminPage() {
                         { id: 'users', label: 'Users', icon: Users, count: stats.totalUsers },
                         { id: 'reviews', label: 'Reviews', icon: Star },
                         { id: 'contests', label: 'Contests', icon: Trophy },
+                        { id: 'logs', label: 'Actions', icon: Activity },
                     ].map((tab) => (
                         <button
                             key={tab.id}
@@ -402,8 +410,11 @@ export default function AdminPage() {
                                         placeholder="Search books by title or author..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                                        className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
                                     />
+                                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                        <VoiceInput onTranscript={setSearchTerm} />
+                                    </div>
                                 </div>
 
                                 {/* Export */}
@@ -552,6 +563,12 @@ export default function AdminPage() {
                 {activeTab === 'contests' && (
                     <div className="animate-slideIn">
                         <ContestManagement />
+                    </div>
+                )}
+
+                {activeTab === 'logs' && (
+                    <div className="animate-slideIn">
+                        <ActivityLogs />
                     </div>
                 )}
             </div>
