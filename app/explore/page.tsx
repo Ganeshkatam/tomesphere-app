@@ -6,7 +6,8 @@ import { supabase, Book, getCurrentUser } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import BookCard from '@/components/BookCard';
 import BackButton from '@/components/BackButton';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { FadeIn, SlideUp, StaggerContainer, StaggerItem } from '@/components/ui/motion';
 import { Search, Filter, Globe, ArrowUpDown, X } from 'lucide-react';
 import VoiceInput from '@/components/ui/VoiceInput';
@@ -91,7 +92,7 @@ export default function ExplorePage() {
             setLoading(false);
         } catch (error) {
             console.error('Error loading data:', error);
-            toast.error('Failed to load books');
+            showError('Failed to load books');
             setLoading(false);
         }
     };
@@ -146,14 +147,14 @@ export default function ExplorePage() {
                     newSet.delete(bookId);
                     return newSet;
                 });
-                toast.success('Removed from likes');
+                showSuccess('Removed from likes');
             } else {
                 await supabase.from('likes').insert({ book_id: bookId, user_id: user.id });
                 setUserLikes(prev => new Set(prev).add(bookId));
-                toast.success('Added to likes!');
+                showSuccess('Added to likes!');
             }
         } catch (error) {
-            toast.error('Failed to update like');
+            showError('Failed to update like');
         }
     };
 
@@ -170,9 +171,9 @@ export default function ExplorePage() {
                 rating
             });
             setUserRatings(prev => new Map(prev).set(bookId, rating));
-            toast.success(`Rated ${rating} stars!`);
+            showSuccess(`Rated ${rating} stars!`);
         } catch (error) {
-            toast.error('Failed to rate');
+            showError('Failed to rate');
         }
     };
 

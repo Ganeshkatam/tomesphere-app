@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { Lock, Mail, Smartphone, ArrowRight, Globe, ChevronDown, Sparkles } from 'lucide-react';
 
 const COUNTRY_CODES = [
@@ -53,7 +54,7 @@ export default function EnhancedLoginPage() {
 
         const type = detectInputType(input);
         if (type === 'unknown') {
-            toast.error('Please enter a valid email or phone number');
+            showError('Please enter a valid email or phone number');
             return;
         }
 
@@ -79,20 +80,20 @@ export default function EnhancedLoginPage() {
                     phone: fullIdentifier,
                 });
                 if (error) throw error;
-                toast.success('SMS code sent!');
+                showSuccess('SMS code sent!');
             } else {
                 const { error } = await supabase.auth.signInWithOtp({
                     email: input,
                     options: { shouldCreateUser: false }
                 });
                 if (error) throw error;
-                toast.success('Magic code sent to your email!');
+                showSuccess('Magic code sent to your email!');
             }
 
             setStep('otp');
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || 'Failed to send verification code');
+            showError(error.message || 'Failed to send verification code');
         } finally {
             setLoading(false);
         }
@@ -150,10 +151,10 @@ export default function EnhancedLoginPage() {
                 return; // Stop here and show MFA screen
             }
 
-            toast.success('Logged in successfully!');
+            showSuccess('Logged in successfully!');
             router.push('/home');
         } catch (error: any) {
-            toast.error(error.message || 'Invalid password');
+            showError(error.message || 'Invalid password');
             setLoading(false);
         }
     };
@@ -177,11 +178,11 @@ export default function EnhancedLoginPage() {
 
             if (error) throw error;
 
-            toast.success('MFA Verified! Logging in...');
+            showSuccess('MFA Verified! Logging in...');
             router.push('/home');
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || 'Invalid code');
+            showError(error.message || 'Invalid code');
         } finally {
             setLoading(false);
         }
@@ -258,10 +259,10 @@ export default function EnhancedLoginPage() {
 
             if (error) throw error;
 
-            toast.success('Verified! Logging in...');
+            showSuccess('Verified! Logging in...');
             router.push('/home');
         } catch (error: any) {
-            toast.error(error.message || 'Invalid code');
+            showError(error.message || 'Invalid code');
         } finally {
             setLoading(false);
         }
@@ -274,7 +275,7 @@ export default function EnhancedLoginPage() {
             provider: 'google',
             options: { redirectTo: `${window.location.origin}/home` }
         });
-        if (error) toast.error(error.message);
+        if (error) showError(error.message);
     };
 
     return (

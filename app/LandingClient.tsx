@@ -1,16 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { FadeIn, SlideUp, ScaleIn, StaggerContainer, StaggerItem } from '@/components/ui/motion';
+import { FadeIn, SlideUp, StaggerContainer, StaggerItem, ScaleIn } from '@/components/animations';
 import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import ALL_GENRES from '@/lib/genres';
 
-import { Menu, X } from 'lucide-react';
-import BookCard from '@/components/BookCard'; // 1. Import BookCard
+import { Book as BookIcon, Search, Sparkles, Flame, Star, BookOpen, User, Menu, X, Download } from 'lucide-react';
 import VoiceInput from '@/components/ui/VoiceInput';
+import BookCard from '@/components/BookCard';
+import SearchSuggestions from '@/components/SearchSuggestions';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+
 
 // Lazy load heavy components
 const AuthGateModal = dynamic(() => import('@/components/AuthGateModal'), { ssr: false });
@@ -134,20 +141,47 @@ export default function LandingClient() {
       });
     } catch (error: any) { // 4. Add toast errors
       console.error('Error fetching data:', error.message);
-      toast.error(`Failed to load data: ${error.message || 'Unknown error'} `);
+      showError(`Failed to load data: ${error.message || 'Unknown error'}`);
+    }
+  };
+
+  // Dynamic Book Fetching (Server-Side)
+  const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const fetchBooks = async (search: string, genreFilters: string[]) => {
+    const isClearing = !search && genreFilters.length === 0;
+    if (!isClearing) setIsSearching(true);
+
+    try {
+      let query = supabase.from('books').select('*').order('created_at', { ascending: false });
+      if (search.trim()) query = query.or(`title.ilike.%${search}%,author.ilike.%${search}%,description.ilike.%${search}%`);
+      if (genreFilters.length > 0) query = query.in('genre', genreFilters);
+
+      const { data, error } = await query;
+      if (error) throw error;
+      setFilteredBooks(data || []);
+    } catch (error: any) {
+      console.error('Error fetching books:', error);
+      showError('Failed to search books');
+    } finally {
+      setIsSearching(false);
     }
   };
 
   const handleSearch = () => {
-    // If there's a search query or genres, scroll to results
+    // If there's a search query or genres, scroll to results and fetch
+    // Manual trigger logic
+    fetchBooks(searchQuery, selectedGenres);
+
     if (searchQuery || selectedGenres.length > 0) {
       setSearchOrigin('book');
       setTimeout(() => {
         document.getElementById('all-books-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } else {
-      // No filters - go to explore page
-      router.push('/explore');
+      // If empty, just fetch default (all books) and maybe scroll?
+      fetchBooks('', []);
     }
   };
 
@@ -167,68 +201,13 @@ export default function LandingClient() {
     return a.localeCompare(b);
   });
 
-  // Dynamic Book Fetching (Server-Side)
-  // Replaces client-side filteredBooks logic
-  const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
 
-  const fetchBooks = async (search: string, genreFilters: string[]) => {
-    // Silent reload check
-    const isClearing = !search && genreFilters.length === 0;
 
-    if (!isClearing) {
-      setIsSearching(true);
-    }
 
-    try {
-      let query = supabase
-        .from('books')
-        .select('*')
-        .order('created_at', { ascending: false });
+  // Removed auto-search effect
 
-      // Apply Search (Case-insensitive multi-column)
-      if (search.trim()) {
-        query = query.or(`title.ilike.%${search}%,author.ilike.%${search}%,description.ilike.%${search}%`);
-      }
 
-      // Apply Genre Filters
-      if (genreFilters.length > 0) {
-        query = query.in('genre', genreFilters);
-      }
 
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setFilteredBooks(data || []);
-    } catch (error: any) {
-      console.error('Error fetching books:', error);
-      toast.error('Failed to search books');
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  // Debounced Search Effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchBooks(searchQuery, selectedGenres);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery, selectedGenres]);
-
-  useEffect(() => {
-    setBooksToShow(10);
-    // Scroll to books section when filters change
-    if (selectedGenres.length > 0 || searchQuery) {
-      setTimeout(() => {
-        const booksSection = document.getElementById('all-books-section');
-        if (booksSection) {
-          booksSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 500); // Slight delay for data load
-    }
-  }, [selectedGenres, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gradient-page relative w-full max-w-full mx-auto overflow-x-hidden">
@@ -250,10 +229,9 @@ export default function LandingClient() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => {
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      const booksSection = document.getElementById('all-books-section');
-                      if (booksSection) booksSection.scrollIntoView({ behavior: 'smooth' });
+                      handleSearch();
                     }
                   }}
                   placeholder="Search title, author, or genre..."
@@ -265,17 +243,37 @@ export default function LandingClient() {
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   {searchQuery && (
                     <button
-                      onClick={() => setSearchQuery('')}
-                      className="text-slate-400 hover:text-white text-sm p-1"
+                      onClick={() => {
+                        setSearchQuery('');
+                        // fetchBooks('', selectedGenres); // No need to fetch books on clear if we are redirecting
+                      }}
+                      className="text-slate-400 hover:text-white text-sm p-1 hover:bg-white/10 rounded-full transition-colors"
                     >
                       ✕
                     </button>
                   )}
                   <VoiceInput
-                    onTranscript={(text) => setSearchQuery(text)}
-                    className="p-1"
+                    onTranscript={(text) => {
+                      setSearchQuery(text);
+                    }}
+                    className="p-1 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white"
                   />
                 </div>
+
+                {/* Search Suggestions for Sticky Bar */}
+                <SearchSuggestions
+                  query={searchQuery}
+                  onSelect={(text, type, id) => {
+                    if (type === 'book' && id) {
+                      router.push(`/books/${id}`);
+                    } else {
+                      setSearchQuery(text);
+                      router.push(`/search?q=${text}`);
+                    }
+                  }}
+                  className="mt-1"
+                />
+
               </div>
 
               {/* Genre Dropdown Selector - Popular & Student-Friendly */}
@@ -332,12 +330,7 @@ export default function LandingClient() {
 
               {/* Search Button */}
               <button
-                onClick={() => {
-                  const booksSection = document.getElementById('all-books-section');
-                  if (booksSection) {
-                    booksSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }}
+                onClick={handleSearch}
                 className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/50 font-medium text-sm flex items-center gap-2 whitespace-nowrap"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -567,21 +560,37 @@ export default function LandingClient() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSearch();
+                      }}
                       placeholder="Search titles, authors, or topics..."
                       className="w-full h-14 pl-14 pr-16 bg-white/5 border border-white/5 rounded-xl text-lg text-white placeholder-slate-500 focus:outline-none focus:bg-white/10 focus:border-primary/50 transition-all font-sans"
                     />
+
                     {/* Voice Input */}
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
                       <VoiceInput
                         onTranscript={(text) => {
                           setSearchQuery(text);
-                          // Optional: Auto-search after a short delay or let user press enter
-                          // For now, we just fill the input
                         }}
+                        className="p-1 hover:bg-white/10 rounded-full transition-colors"
                       />
                     </div>
+
+                    {/* Search Suggestions */}
+                    <SearchSuggestions
+                      query={searchQuery}
+                      onSelect={(text, type, id) => {
+                        if (type === 'book' && id) {
+                          router.push(`/books/${id}`);
+                        } else {
+                          setSearchQuery(text);
+                          router.push(`/search?q=${text}`);
+                        }
+                      }}
+                    />
                   </div>
+
 
                   {/* Search Button */}
                   <button
@@ -733,13 +742,24 @@ export default function LandingClient() {
                     );
                   })}
                   {selectedGenres.length > 0 && (
-                    <button
-                      onClick={() => setSelectedGenres([])}
-                      title="Clear filters"
-                      className="px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 border backdrop-blur-md bg-red-600/20 text-red-300 border-red-500/30 hover:bg-red-600/30 hover:border-red-500/50"
-                    >
-                      Clear ({selectedGenres.length})
-                    </button>
+                    <>
+                      <button
+                        onClick={() => {
+                          setSelectedGenres([]);
+                          fetchBooks(searchQuery, []); // Instant clear
+                        }}
+                        title="Clear filters"
+                        className="px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 border backdrop-blur-md bg-red-600/20 text-red-300 border-red-500/30 hover:bg-red-600/30 hover:border-red-500/50"
+                      >
+                        Clear ({selectedGenres.length})
+                      </button>
+                      <button
+                        onClick={() => handleSearch()}
+                        className="px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 border backdrop-blur-md bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-700 hover:border-indigo-400"
+                      >
+                        Apply
+                      </button>
+                    </>
                   )}
                 </div>
 
@@ -805,7 +825,7 @@ export default function LandingClient() {
                   Discover what the community is reading
                 </p>
               </div>
-              <a href="/explore" className="btn btn-ghost hidden sm:inline-flex">
+              <a href="/search" className="btn btn-ghost hidden sm:inline-flex">
                 View All →
               </a>
             </div>
@@ -998,7 +1018,7 @@ export default function LandingClient() {
                 <a href="/signup" className="btn-primary text-lg px-8 py-4">
                   Create Free Account
                 </a>
-                <a href="/explore" className="btn btn-ghost text-lg px-8 py-4">
+                <a href="/search" className="btn btn-ghost text-lg px-8 py-4">
                   Browse Library
                 </a>
               </div>

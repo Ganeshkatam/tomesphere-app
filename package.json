@@ -15,6 +15,8 @@
     "@picovoice/porcupine-react": "^4.0.0",
     "@picovoice/web-voice-processor": "^4.0.9",
     "@stripe/stripe-js": "^8.6.0",
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.39.0",
     "@types/papaparse": "^5.5.2",
     "clsx": "^2.0.0",

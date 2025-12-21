@@ -3,7 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
+import { showError, showSuccess, showWarning } from '@/lib/toast';
 import { validateEmail, validateEmailQuick } from '@/lib/emailValidation';
 import { detectInputType } from '@/lib/inputDetection';
 import { FadeIn, SlideUp, ScaleIn } from '@/components/ui/motion';
@@ -68,12 +69,12 @@ function SignupForm() {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-            toast.error('Passwords do not match');
+            showError('Passwords do not match');
             return;
         }
 
         if (password.length < 6) {
-            toast.error('Password must be at least 6 characters');
+            showError('Password must be at least 6 characters');
             return;
         }
 
@@ -109,7 +110,7 @@ function SignupForm() {
                     if (otpError) {
                         // If error mentions SMS/Twilio, show helpful message
                         if (otpError.message.includes('SMS') || otpError.message.includes('phone')) {
-                            toast.error('Phone authentication not configured. Please configure Twilio in Supabase or use email signup.');
+                            showWarning('Phone authentication not configured. Please configure Twilio in Supabase or use email signup.');
                         } else {
                             throw otpError;
                         }
@@ -118,13 +119,13 @@ function SignupForm() {
                         return;
                     }
 
-                    toast.success('Verification code sent to your phone!');
+                    showSuccess('Verification code sent to your phone!');
                     setStep('otp');
                     setLoading(false);
                     setValidatingEmail(false);
                     return;
                 } catch (error: any) {
-                    toast.error(error.message || 'Failed to send OTP. Please try email signup.');
+                    showError(error.message || 'Failed to send OTP. Please try email signup.');
                     setLoading(false);
                     setValidatingEmail(false);
                     return;
@@ -137,7 +138,7 @@ function SignupForm() {
             if (!validation.isValid) {
                 setValidatingEmail(false);
                 setLoading(false);
-                toast.error(validation.error!);
+                showError(validation.error!);
                 return;
             }
 
@@ -194,7 +195,7 @@ function SignupForm() {
                     console.warn('Profile creation skipped - trigger will handle:', profileErr);
                 }
 
-                toast.success('Account created successfully! 🎉');
+                showSuccess('Account created successfully! 🎉');
 
                 // Always redirect to home for new users - no profile setup required
                 setTimeout(() => {
@@ -202,7 +203,7 @@ function SignupForm() {
                 }, 1500);
             } else if (authData.user && !authData.session) {
                 // Email confirmation required
-                toast.success('Account created! Check your email to verify.');
+                showSuccess('Account created! Check your email to verify.');
                 setTimeout(() => {
                     router.push('/home');
                 }, 1500);
@@ -212,13 +213,13 @@ function SignupForm() {
             // Show user-friendly error message
             const errorMessage = error.message || 'Failed to create account';
             if (errorMessage.includes('Database')) {
-                toast.error('Account created but profile setup pending. You can continue to login.');
+                showWarning('Account created but profile setup pending. You can continue to login.');
                 setTimeout(() => {
                     router.push('/login');
                 }, 2000);
                 return; // Return early to prevent further execution
             } else {
-                toast.error(errorMessage);
+                showError(errorMessage);
             }
         } finally {
             setLoading(false);
@@ -249,14 +250,14 @@ function SignupForm() {
 
             if (error) {
                 if (error.message.includes('not enabled')) {
-                    toast.error('Google Sign-Up not configured. Please use email/phone or contact admin.');
+                    showWarning('Google Sign-Up not configured. Please use email/phone or contact admin.');
                 } else {
                     throw error;
                 }
             }
         } catch (error: any) {
             console.error('Google Sign-Up Error:', error);
-            toast.error(error.message || 'Failed to sign up with Google');
+            showError(error.message || 'Failed to sign up with Google');
         } finally {
             setLoading(false);
         }
@@ -298,10 +299,10 @@ function SignupForm() {
 
                                 if (error) throw error;
 
-                                toast.success('Phone verified! Account created! 🎉');
+                                showSuccess('Phone verified! Account created! 🎉');
                                 setTimeout(() => router.push('/home'), 1500);
                             } catch (error: any) {
-                                toast.error(error.message || 'Invalid OTP. Please try again.');
+                                showError(error.message || 'Invalid OTP. Please try again.');
                                 setLoading(false);
                             }
                         }} className="space-y-6">

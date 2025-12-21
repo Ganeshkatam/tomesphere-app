@@ -12,6 +12,7 @@ import AnalyticsDashboard from '@/components/admin/analytics/AnalyticsDashboard'
 import BulkActionsPanel from '@/components/admin/BulkActionsPanel';
 import ActivityLogs from '@/components/admin/ActivityLogs';
 import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import {
     TrendingUp, TrendingDown, Users, BookOpen, Star, Clock,
     Search, Filter, Download, Edit2, Trash2, Eye, BarChart3,
@@ -74,7 +75,7 @@ export default function AdminPage() {
             setLoading(false);
         } catch (error) {
             console.error('Error initializing admin page:', error);
-            toast.error('Failed to load admin panel');
+            showError('Failed to load admin panel');
             setLoading(false);
         }
     };
@@ -132,7 +133,7 @@ export default function AdminPage() {
             });
         } catch (error) {
             console.error('Error fetching data:', error);
-            toast.error('Failed to fetch admin data');
+            showError('Failed to fetch admin data');
         } finally {
             setRefreshing(false);
         }
@@ -174,9 +175,9 @@ export default function AdminPage() {
             if (error) throw error;
 
             setBooks(prev => prev.filter(b => b.id !== bookId));
-            toast.success('Book deleted successfully');
+            showSuccess('Book deleted successfully');
         } catch (error) {
-            toast.error('Failed to delete book');
+            showError('Failed to delete book');
         }
     };
 
@@ -192,16 +193,16 @@ export default function AdminPage() {
             setBooks(prev =>
                 prev.map(b => (b.id === bookId ? { ...b, is_featured: !currentStatus } : b))
             );
-            toast.success(currentStatus ? 'Removed from featured' : 'Added to featured');
+            showSuccess(currentStatus ? 'Removed from featured' : 'Added to featured');
         } catch (error) {
-            toast.error('Failed to update book');
+            showError('Failed to update book');
         }
     };
 
     const handleExportPDF = () => {
         const filename = `admin-books-report-${Date.now()}.pdf`;
         exportBooksToPDF(filteredBooks, filename);
-        toast.success('Report downloaded!');
+        showSuccess('Report downloaded!');
     };
 
     if (loading) {

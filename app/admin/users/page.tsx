@@ -10,7 +10,7 @@ import {
     Ban,
     Trash2
 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard';
 import { logAdminAction } from '@/lib/audit';
 
@@ -35,7 +35,7 @@ export default function UserManagement() {
             setUsers(data || []);
         } catch (error) {
             console.error('Error fetching users:', error);
-            toast.error('Failed to load users');
+            showError('Failed to load users');
         } finally {
             setLoading(false);
         }
@@ -68,10 +68,10 @@ export default function UserManagement() {
             if (error) throw error;
 
             setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
-            toast.success(`User role updated to ${newRole}`);
+            showSuccess(`User role updated to ${newRole}`);
             logAdminAction('USER_ROLE_UPDATE', `Changed role for ${email} to ${newRole}`);
         } catch (error) {
-            toast.error('Failed to update role');
+            showError('Failed to update role');
         }
     };
 
@@ -89,10 +89,10 @@ export default function UserManagement() {
             if (error) throw error;
 
             setUsers(users.map(u => u.id === userId ? { ...u, role: 'banned' } : u));
-            toast.success(`User ${email} has been banned`);
+            showSuccess(`User ${email} has been banned`);
             logAdminAction('USER_BAN', `Banned user ${email}`);
         } catch (error: any) {
-            toast.error('Failed to ban user: ' + error.message);
+            showError('Failed to ban user: ' + error.message);
         }
     };
 
@@ -110,10 +110,10 @@ export default function UserManagement() {
             if (error) throw error;
 
             setUsers(users.filter(u => u.id !== userId));
-            toast.success(`User ${email} deleted`);
+            showSuccess(`User ${email} deleted`);
             logAdminAction('USER_DELETE', `Deleted user profile ${email}`);
         } catch (error: any) {
-            toast.error('Failed to delete user: ' + error.message);
+            showError('Failed to delete user: ' + error.message);
         }
     };
 

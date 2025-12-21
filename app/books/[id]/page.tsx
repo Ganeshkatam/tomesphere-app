@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { supabase, Book, getCurrentUser } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, BookOpen, Heart } from 'lucide-react';
 import { generateSimpleDescription } from '@/lib/pdf-description-generator';
 
@@ -102,7 +103,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
             setLoading(false);
         } catch (error) {
             console.error('Error loading book:', error);
-            toast.error('Failed to load book');
+            showError('Failed to load book');
             setLoading(false);
         }
     };
@@ -117,14 +118,14 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
             if (isLiked) {
                 await supabase.from('likes').delete().eq('book_id', bookId).eq('user_id', user.id);
                 setIsLiked(false);
-                toast.success('Removed from likes');
+                showSuccess('Removed from likes');
             } else {
                 await supabase.from('likes').insert({ book_id: bookId, user_id: user.id });
                 setIsLiked(true);
-                toast.success('Added to likes!');
+                showSuccess('Added to likes!');
             }
         } catch (error) {
-            toast.error('Failed to update like');
+            showError('Failed to update like');
         }
     };
 
@@ -135,7 +136,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
         }
 
         if (!reviewContent.trim()) {
-            toast.error('Review cannot be empty');
+            showError('Review cannot be empty');
             return;
         }
 
@@ -149,12 +150,12 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
 
             if (error) throw error;
 
-            toast.success('Review posted!');
+            showSuccess('Review posted!');
             setReviewContent('');
             loadBookDetails(); // Refresh list
         } catch (error) {
             console.error('Error posting review:', error);
-            toast.error('Failed to post review');
+            showError('Failed to post review');
         } finally {
             setIsSubmittingReview(false);
         }
@@ -173,10 +174,10 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                 rating
             });
             setUserRating(rating);
-            toast.success(`Rated ${rating} stars!`);
+            showSuccess(`Rated ${rating} stars!`);
             loadBookDetails(); // Refresh ratings
         } catch (error) {
-            toast.error('Failed to rate');
+            showError('Failed to rate');
         }
     };
 
@@ -244,7 +245,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                                         router.push('/admin');
                                     } catch (e) {
                                         toast.dismiss();
-                                        toast.error('Failed to delete book');
+                                        showError('Failed to delete book');
                                     }
                                 }}
                                 className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-lg text-sm font-medium transition-colors border border-red-500/20"
@@ -334,7 +335,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                                             toast.success('Download started!');
                                         }
                                     } else {
-                                        toast.error('Download not available');
+                                        showError('Download not available');
                                     }
                                 }}
                                 className="btn btn-accent w-full"
