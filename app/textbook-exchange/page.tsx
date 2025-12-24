@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 import { ArrowLeft, DollarSign, Book, Heart, ShoppingBag } from 'lucide-react';
 import VoiceInput from '@/components/ui/VoiceInput';
@@ -47,7 +47,7 @@ export default function TextbookExchangePage() {
             if (error) throw error;
             setListings(data || []);
         } catch (error: any) {
-            toast.error('Failed to load listings');
+            showError('Failed to load listings');
         } finally {
             setLoading(false);
         }
@@ -184,7 +184,7 @@ export default function TextbookExchangePage() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            toast.success('Saved!');
+                                            showSuccess('Saved!');
                                         }}
                                         className="text-slate-400 hover:text-red-400 transition-colors"
                                     >

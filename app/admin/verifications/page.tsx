@@ -11,7 +11,7 @@ import {
     Calendar,
     AlertCircle
 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard';
 import { logAdminAction } from '@/lib/audit';
 
@@ -38,7 +38,7 @@ export default function VerificationQueue() {
             if (error) throw error;
             setRequests(data || []);
         } catch (error) {
-            toast.error('Failed to load requests');
+            showError('Failed to load requests');
             console.error(error);
         } finally {
             setLoading(false);
@@ -77,14 +77,14 @@ export default function VerificationQueue() {
                 `Processed student verification for user ID ${userId}. Status: ${approve ? 'Approved' : 'Rejected'}`
             );
 
-            toast.success(approve ? 'Student verified successfully!' : 'Request rejected');
+            showSuccess(approve ? 'Student verified successfully!' : 'Request rejected');
 
             // Remove from local list
             setRequests(prev => prev.filter(r => r.id !== id));
 
         } catch (error: any) {
             console.error('Action failed:', error);
-            toast.error(error.message || 'Action failed');
+            showError(error.message || 'Action failed');
         } finally {
             setProcessingId(null);
         }

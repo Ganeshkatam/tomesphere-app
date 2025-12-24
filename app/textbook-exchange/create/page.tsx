@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, DollarSign } from 'lucide-react';
 
 export default function CreateListingPage() {
@@ -39,7 +39,7 @@ export default function CreateListingPage() {
         e.preventDefault();
 
         if (!validate()) {
-            toast.error('Please fix the errors in the form');
+            showError('Please fix the errors in the form');
             return;
         }
 
@@ -65,10 +65,10 @@ export default function CreateListingPage() {
 
             if (error) throw error;
 
-            toast.success('Listing created!');
+            showSuccess('Listing created!');
             router.push('/textbook-exchange');
         } catch (error: any) {
-            toast.error('Failed to create listing');
+            showError('Failed to create listing');
         } finally {
             setLoading(false);
         }

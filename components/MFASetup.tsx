@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { QrCode } from 'lucide-react';
 import QRCodeLib from 'qrcode';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { Loader2, Copy, CheckCircle, Shield } from 'lucide-react';
 
 export default function MFASetup() {
@@ -56,7 +56,7 @@ export default function MFASetup() {
             setStep('qr');
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || 'Failed to start enrollment');
+            showError(error.message || 'Failed to start enrollment');
         } finally {
             setLoading(false);
         }
@@ -74,12 +74,12 @@ export default function MFASetup() {
 
             if (error) throw error;
 
-            toast.success('MFA Enabled Successfully!');
+            showSuccess('MFA Enabled Successfully!');
             setIsEnabled(true);
             setStep('success');
         } catch (error: any) {
             console.error(error);
-            toast.error('Invalid code. Please try again.');
+            showError('Invalid code. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -100,14 +100,14 @@ export default function MFASetup() {
             if (totpFactor) {
                 const { error } = await supabase.auth.mfa.unenroll({ factorId: totpFactor.id });
                 if (error) throw error;
-                toast.success('MFA Disabled');
+                showSuccess('App Authenticator enabled!');
                 setIsEnabled(false);
                 setStep('initial');
             } else {
-                toast.error('No active MFA factor found to disable.');
+                showError('Failed to initialize MFA');
             }
         } catch (e: any) {
-            toast.error(e.message || 'Failed to disable MFA');
+            showError(e.message || 'Failed to disable MFA');
         } finally {
             setLoading(false);
         }
@@ -177,7 +177,7 @@ export default function MFASetup() {
                     <div className="bg-white/5 p-4 rounded-lg flex items-center justify-between gap-4">
                         <code className="text-blue-400 font-mono text-sm break-all">{secret}</code>
                         <button
-                            onClick={() => { navigator.clipboard.writeText(secret || ''); toast.success('Copied!'); }}
+                            onClick={() => { navigator.clipboard.writeText(secret || ''); showSuccess('Copied!'); }}
                             className="text-slate-400 hover:text-white"
                         >
                             <Copy size={16} />

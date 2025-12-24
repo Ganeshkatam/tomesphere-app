@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, Save, Trash2, Mic } from 'lucide-react';
 import VoiceInput from '@/components/ui/VoiceInput';
 import dynamic from 'next/dynamic';
@@ -72,7 +72,7 @@ export default function NoteEditorPage() {
             setContent(data.content);
             setTags(data.tags || []);
         } catch (error: any) {
-            toast.error('Failed to load note');
+            showError('Failed to load note');
             router.push('/notes');
         } finally {
             setLoading(false);
@@ -81,7 +81,7 @@ export default function NoteEditorPage() {
 
     const handleSave = async () => {
         if (!title.trim()) {
-            toast.error('Please enter a title');
+            showError('Please enter a title');
             return;
         }
 
@@ -97,7 +97,7 @@ export default function NoteEditorPage() {
                 });
 
                 if (error) throw error;
-                toast.success('Note created!');
+                showSuccess('Note created!');
             } else {
                 // Update existing note
                 const { error } = await supabase
@@ -111,12 +111,12 @@ export default function NoteEditorPage() {
                     .eq('id', noteId);
 
                 if (error) throw error;
-                toast.success('Note updated!');
+                showSuccess('Note updated!');
             }
 
             router.push('/notes');
         } catch (error: any) {
-            toast.error('Failed to save note');
+            showError('Failed to save note');
         } finally {
             setSaving(false);
         }
@@ -133,10 +133,10 @@ export default function NoteEditorPage() {
 
             if (error) throw error;
 
-            toast.success('Note deleted');
+            showSuccess('Note deleted');
             router.push('/notes');
         } catch (error: any) {
-            toast.error('Failed to delete note');
+            showError('Failed to delete note');
         }
     };
 

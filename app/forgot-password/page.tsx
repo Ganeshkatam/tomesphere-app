@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ export default function ForgotPasswordPage() {
         e.preventDefault();
 
         if (!email) {
-            toast.error('Please enter your email');
+            showError('Please enter your email');
             return;
         }
 
@@ -27,11 +27,11 @@ export default function ForgotPasswordPage() {
 
             if (error) throw error;
 
-            toast.success('Password reset link sent to your email!');
+            showSuccess('Password reset link sent to your email!');
             setSent(true);
         } catch (error: any) {
             console.error('Error:', error);
-            toast.error(error.message || 'Failed to send reset link');
+            showError(error.message || 'Failed to send reset link');
         } finally {
             setLoading(false);
         }
@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page flex items-start justify-center p-4 sm:p-6 md:py-12">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
 
             <div className="w-full max-w-md">
                 {/* Header */}

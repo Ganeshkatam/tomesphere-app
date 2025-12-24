@@ -3,7 +3,7 @@
 import { mockClubs } from '@/lib/mockSocialData';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { useState, useEffect } from 'react';
 
 export default function ActiveClubs() {
@@ -16,12 +16,12 @@ export default function ActiveClubs() {
 
   const handleJoinClub = async (clubName: string) => {
     if (!user) {
-      toast.error('Please sign in to join book clubs');
+      showError('Please sign in to join book clubs');
       router.push('/login');
       return;
     }
 
-    toast.success(`Welcome to ${clubName}! 🎉`);
+    showSuccess(`Welcome to ${clubName}!`);
     // In future: await supabase.from('club_members').insert(...)
   };
 

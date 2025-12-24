@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { X } from 'lucide-react';
 
 interface CreateClubModalProps {
@@ -19,7 +19,7 @@ export default function CreateClubModal({ user, onClose, onSuccess }: CreateClub
         e.preventDefault();
 
         if (!name.trim()) {
-            toast.error('Please enter a club name');
+            showError('Please fill in all required fields');
             return;
         }
 
@@ -50,12 +50,12 @@ export default function CreateClubModal({ user, onClose, onSuccess }: CreateClub
 
             if (memberError) throw memberError;
 
-            toast.success('Book club created!');
+            showSuccess('Book Club created!');
             onSuccess();
             onClose();
         } catch (error: any) {
             console.error('Error creating club:', error);
-            toast.error(error.message || 'Failed to create club');
+            showError(error.message || 'Failed to create club');
         } finally {
             setLoading(false);
         }

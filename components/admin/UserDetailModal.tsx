@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, User, Mail, Calendar, Activity, Clock, Shield, Ban, Key, MessageCircle, TrendingUp, BookOpen, Eye } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { supabase } from '@/lib/supabase';
 
 interface UserDetailModalProps {
@@ -83,7 +83,7 @@ export default function UserDetailModal({ userId, onClose, onUserUpdated }: User
             setLogins(loginData || []);
         } catch (error) {
             console.error('Error fetching user data:', error);
-            toast.error('Failed to load user data');
+            showError('Failed to load user data');
         } finally {
             setLoading(false);
         }
@@ -104,12 +104,12 @@ export default function UserDetailModal({ userId, onClose, onUserUpdated }: User
 
             if (error) throw error;
 
-            toast.success('User banned successfully');
+            showSuccess('User banned successfully');
             onUserUpdated();
             fetchUserData();
         } catch (error) {
             console.error('Error banning user:', error);
-            toast.error('Failed to ban user');
+            showError('Failed to ban user');
         } finally {
             setProcessing(false);
         }
@@ -126,10 +126,10 @@ export default function UserDetailModal({ userId, onClose, onUserUpdated }: User
 
             if (error) throw error;
 
-            toast.success('Password reset email sent');
+            showSuccess('Password reset email sent');
         } catch (error) {
             console.error('Error sending reset email:', error);
-            toast.error('Failed to send reset email');
+            showError('Failed to send reset email');
         } finally {
             setProcessing(false);
         }
@@ -195,8 +195,8 @@ export default function UserDetailModal({ userId, onClose, onUserUpdated }: User
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeTab === tab.id
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-white/5 text-slate-400 hover:bg-white/10'
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-white/5 text-slate-400 hover:bg-white/10'
                                 }`}
                         >
                             <tab.icon size={18} />

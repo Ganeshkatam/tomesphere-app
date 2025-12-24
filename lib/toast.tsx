@@ -6,7 +6,7 @@ import React from 'react';
 
 // Toast configuration with excellent styling
 const toastConfig = {
-    duration: 4000,
+    duration: 3000,
     style: {
         background: '#1e293b',
         color: '#f1f5f9',
@@ -43,7 +43,7 @@ export const showError = (message: string, options?: { duration?: number }) => {
                 </button>
             </div>
         ),
-        { duration: options?.duration ?? 5000 }
+        { duration: options?.duration ?? 3000 }
     );
 };
 
@@ -69,7 +69,7 @@ export const showSuccess = (message: string, options?: { duration?: number }) =>
                 </button>
             </div>
         ),
-        { duration: options?.duration ?? 4000 }
+        { duration: options?.duration ?? 3000 }
     );
 };
 
@@ -95,7 +95,7 @@ export const showWarning = (message: string, options?: { duration?: number }) =>
                 </button>
             </div>
         ),
-        { duration: options?.duration ?? 5000 }
+        { duration: options?.duration ?? 3000 }
     );
 };
 
@@ -121,7 +121,7 @@ export const showInfo = (message: string, options?: { duration?: number }) => {
                 </button>
             </div>
         ),
-        { duration: options?.duration ?? 4000 }
+        { duration: options?.duration ?? 3000 }
     );
 };
 
@@ -171,6 +171,7 @@ export const showPromise = <T,>(
             style: toastConfig.style,
             success: {
                 icon: <CheckCircle className="w-5 h-5 text-green-400" />,
+                duration: 3000,
                 style: {
                     ...toastConfig.style,
                     borderColor: 'rgba(34, 197, 94, 0.3)',
@@ -179,6 +180,7 @@ export const showPromise = <T,>(
             },
             error: {
                 icon: <XCircle className="w-5 h-5 text-red-400" />,
+                duration: 3000,
                 style: {
                     ...toastConfig.style,
                     borderColor: 'rgba(239, 68, 68, 0.3)',
@@ -206,14 +208,14 @@ export const toasterConfig = {
     toastOptions: {
         ...toastConfig,
         success: {
-            duration: 4000,
+            duration: 3000,
             iconTheme: {
                 primary: '#22c55e',
                 secondary: '#dcfce7',
             },
         },
         error: {
-            duration: 5000,
+            duration: 3000,
             iconTheme: {
                 primary: '#ef4444',
                 secondary: '#fee2e2',

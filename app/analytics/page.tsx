@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 import {
     TrendingUp,
     FileText,
@@ -82,7 +82,7 @@ export default function AnalyticsPage() {
                 lastStudyDate
             });
         } catch (error: any) {
-            toast.error('Failed to load analytics');
+            showError('Failed to load analytics');
         } finally {
             setLoading(false);
         }

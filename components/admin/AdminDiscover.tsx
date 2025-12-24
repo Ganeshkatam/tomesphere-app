@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase, Book as BookType } from '@/lib/supabase';
 import { generateAIRecommendations, getTrendingBooks } from '@/lib/ai-recommendations';
 import BookCard from '@/components/BookCard';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { Search, BookOpen, Sparkles, Flame, Telescope } from 'lucide-react';
 import { FadeIn, SlideUp, StaggerContainer, StaggerItem } from '@/components/ui/motion';
 
@@ -89,7 +89,7 @@ export default function AdminDiscover({ user }: AdminDiscoverProps) {
 
         } catch (error) {
             console.error('Error loading discovery data:', error);
-            toast.error('Failed to load books');
+            showError('Failed to load books');
         } finally {
             setLoading(false);
         }
@@ -136,16 +136,16 @@ export default function AdminDiscover({ user }: AdminDiscoverProps) {
                     .eq('user_id', user.id)
                     .eq('book_id', bookId);
                 setUserLikes(prev => prev.filter(id => id !== bookId));
-                toast.success('Removed from favorites');
+                showSuccess('Removed from favorites');
             } else {
                 await supabase
                     .from('likes')
                     .insert({ user_id: user.id, book_id: bookId });
                 setUserLikes(prev => [...prev, bookId]);
-                toast.success('Added to favorites');
+                showSuccess('Added to favorites');
             }
         } catch (error) {
-            toast.error('Failed to update like');
+            showError('Failed to update like');
         }
     };
 
@@ -165,9 +165,9 @@ export default function AdminDiscover({ user }: AdminDiscoverProps) {
             if (error) throw error;
 
             setUserRatings(prev => ({ ...prev, [bookId]: rating }));
-            toast.success(`Rated ${rating} stars!`);
+            showSuccess(`Rated ${rating} stars!`);
         } catch (error) {
-            toast.error('Failed to submit rating');
+            showError('Failed to submit rating');
         }
     };
 
@@ -190,9 +190,9 @@ export default function AdminDiscover({ user }: AdminDiscoverProps) {
                 'currently_reading': 'Currently Reading',
                 'finished': 'Finished'
             };
-            toast.success(`Added to ${statusLabels[status]}`);
+            showSuccess(`Added to ${statusLabels[status]}`);
         } catch (error) {
-            toast.error('Failed to update reading list');
+            showError('Failed to update reading list');
         }
     };
 

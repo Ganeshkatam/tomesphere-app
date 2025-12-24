@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { Upload, File, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 interface UniversalFileUploadProps {
     onFileUploaded: (url: string, fileName: string, fileType: string) => void;
@@ -64,7 +64,7 @@ export default function UniversalFileUpload({
         const fileSizeMB = file.size / (1024 * 1024);
         if (fileSizeMB > maxSizeMB) {
             setError(`File size (${formatFileSize(file.size)}) exceeds ${maxSizeMB}MB limit`);
-            toast.error(`File too large! Maximum size is ${maxSizeMB}MB`);
+            showError(`File too large! Maximum size is ${maxSizeMB}MB`);
             return;
         }
 
@@ -99,11 +99,11 @@ export default function UniversalFileUpload({
             const fileUrl = urlData.publicUrl;
             setUploadedFile(fileUrl);
             onFileUploaded(fileUrl, file.name, file.type);
-            toast.success(`${file.name} uploaded successfully!`);
-        } catch (error) {
+            showSuccess(`${file.name} uploaded successfully!`);
+        } catch (error: any) {
             console.error('Upload error:', error);
             setError('Failed to upload file');
-            toast.error('Failed to upload file');
+            showError(error.message || 'Upload failed');
         } finally {
             setUploading(false);
         }
@@ -175,7 +175,7 @@ export default function UniversalFileUpload({
                         type="button"
                         onClick={() => {
                             if (!urlInput) {
-                                toast.error('Please enter a URL');
+                                showError('Please enter a URL');
                                 return;
                             }
                             setUploadedFile(urlInput);
@@ -183,7 +183,7 @@ export default function UniversalFileUpload({
                             setFileName(fileName);
                             setFileType('url');
                             onFileUploaded(urlInput, fileName, 'url');
-                            toast.success('URL added successfully!');
+                            showSuccess('File uploaded successfully!');
                         }}
                         className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
                     >

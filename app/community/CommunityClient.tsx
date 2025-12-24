@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, getCurrentUser } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { MessageSquare, Heart, Users, Plus, TrendingUp, Clock, BookOpen } from 'lucide-react';
 import CreateDiscussionModal from '@/components/CreateDiscussionModal';
 import CreateClubModal from '@/components/CreateClubModal';
@@ -55,7 +55,7 @@ export default function CommunityClient() {
                     const newDiscussion = payload.new as Discussion;
                     // Simple logic to add new discussion if dynamic fetching isn't complex
                     // Ideally we'd fetch the related profile/book data for it first
-                    toast.success('New discussion posted!');
+                    showSuccess('New discussion posted!');
                     if (activeTab === 'discussions') {
                         // Reload list to get full joins
                         loadDiscussions(user);
@@ -172,7 +172,7 @@ export default function CommunityClient() {
             // Reload discussions
             await loadDiscussions(user);
         } catch (error) {
-            toast.error('Failed to like discussion');
+            showError('Failed to like discussion');
         }
     };
 
@@ -186,18 +186,18 @@ export default function CommunityClient() {
                     .delete()
                     .eq('club_id', clubId)
                     .eq('user_id', user.id);
-                toast.success('Left club');
+                showSuccess('Left club');
             } else {
                 await supabase
                     .from('club_members')
                     .insert({ club_id: clubId, user_id: user.id });
-                toast.success('Joined club!');
+                showSuccess('Joined club!');
             }
 
             // Reload clubs
             await loadBookClubs(user);
         } catch (error) {
-            toast.error('Failed to join club');
+            showError('Failed to join club');
         }
     };
 

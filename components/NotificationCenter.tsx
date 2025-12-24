@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Bell, Check, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getUserNotifications, markAsRead, markAllAsRead, deleteNotification, requestNotificationPermission, onMessageListener } from '@/lib/notifications';
-import toast from 'react-hot-toast';
+import { showSuccess } from '@/lib/toast';
 import { timeAgo } from '@/lib/utils'; // Assuming this utility exists or I'll implement a simple one inline
 
 export default function NotificationCenter({ user }: { user: any }) {
@@ -36,7 +36,7 @@ export default function NotificationCenter({ user }: { user: any }) {
                     const newNotif = payload.new;
                     setNotifications(prev => [newNotif, ...prev]);
                     setUnreadCount(prev => prev + 1);
-                    toast.success('New notification');
+                    showSuccess('New notification');
                 }
             )
             .subscribe();

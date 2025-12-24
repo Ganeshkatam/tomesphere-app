@@ -6,7 +6,7 @@ import { supabase, Book } from '@/lib/supabase';
 import { exportBooksToPDF } from '@/lib/pdf-export';
 import BookUploadForm from '@/components/admin/BookUploadForm';
 import BulkActionsPanel from '@/components/admin/BulkActionsPanel';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import {
     BookOpen,
     Search,
@@ -50,7 +50,7 @@ export default function BooksManagement() {
             setBooks(data || []);
         } catch (error) {
             console.error('Error fetching books:', error);
-            toast.error('Failed to load books');
+            showError('Failed to load books');
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -95,9 +95,9 @@ export default function BooksManagement() {
             setBooks(prev => prev.filter(b => b.id !== bookId));
 
             await logAdminAction('DELETE_BOOK', `Deleted book ID: ${bookId}`);
-            toast.success('Book deleted successfully');
+            showSuccess('Book deleted successfully');
         } catch (error) {
-            toast.error('Failed to delete book');
+            showError('Failed to delete book');
         }
     };
 
@@ -115,16 +115,16 @@ export default function BooksManagement() {
             );
 
             await logAdminAction('UPDATE_BOOK', `Toggled featured status for book ID: ${bookId} to ${!currentStatus}`);
-            toast.success(currentStatus ? 'Removed from featured' : 'Added to featured');
+            showSuccess(currentStatus ? 'Removed from featured' : 'Added to featured');
         } catch (error) {
-            toast.error('Failed to update book');
+            showError('Failed to update book');
         }
     };
 
     const handleExportPDF = () => {
         const filename = `admin-books-report-${Date.now()}.pdf`;
         exportBooksToPDF(filteredBooks, filename);
-        toast.success('Report downloaded!');
+        showSuccess('Report downloaded!');
     };
 
     if (loading) {

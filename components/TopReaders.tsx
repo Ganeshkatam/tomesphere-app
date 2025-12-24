@@ -3,7 +3,7 @@
 import { topReaders } from '@/lib/mockSocialData';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { useState, useEffect } from 'react';
 
 export default function TopReaders() {
@@ -16,12 +16,12 @@ export default function TopReaders() {
 
     const handleFollow = async (readerName: string) => {
         if (!user) {
-            toast.error('Please sign in to follow readers');
+            showError('Please sign in to follow readers');
             router.push('/login');
             return;
         }
 
-        toast.success(`Now following ${readerName}! 🎉`);
+        showSuccess(`Now following ${readerName}!`);
         // In future: await supabase.from('follows').insert(...)
     };
 

@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { MessageSquare, Search, User } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+// import toast, { Toaster } from 'react-hot-toast';
 
 export default function MessagesPage() {
     const router = useRouter();
@@ -45,7 +45,7 @@ export default function MessagesPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role="user" currentPage="/messages" />
 
             <div className="max-w-6xl mx-auto px-4 py-8 h-[calc(100vh-80px)]">

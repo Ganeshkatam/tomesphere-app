@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess, showWarning } from '@/lib/toast';
 import { useState, useEffect } from 'react';
 import StudentVerificationModal from './StudentVerificationModal';
 
@@ -35,18 +35,18 @@ export default function StudentSection() {
 
     const handleVerifyStudent = () => {
         if (!user) {
-            toast.error('Please sign in to verify student status');
+            showError('Please sign in to verify student status');
             router.push('/signup');
             return;
         }
 
         if (studentStatus === 'verified') {
-            toast.success('You are already verified as a student! 🎓');
+            showSuccess('You are already verified as a student!');
             return;
         }
 
         if (studentStatus === 'pending') {
-            toast('Your verification is pending review', { icon: '⏳' });
+            showWarning('Your verification is pending review');
             return;
         }
 

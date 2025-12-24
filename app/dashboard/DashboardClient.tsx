@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, getCurrentUser, Book } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 
 interface DashboardData {
     likedBooks: Book[];
@@ -108,7 +108,7 @@ export default function DashboardPage() {
             setLoading(false);
         } catch (error) {
             console.error('Error loading dashboard:', error);
-            toast.error('Failed to load dashboard');
+            showError('Failed to load dashboard');
             setLoading(false);
         }
     };
@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role="user" currentPage="/dashboard" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

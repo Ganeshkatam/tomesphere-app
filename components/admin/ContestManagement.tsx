@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { Plus, Edit2, Trash2, Calendar, Trophy, Users, Search, Filter } from 'lucide-react';
 import ContestForm from './ContestForm';
 import VoiceInput from '@/components/ui/VoiceInput';
@@ -30,7 +30,7 @@ export default function ContestManagement() {
             setContests(data || []);
         } catch (error) {
             console.error('Error fetching contests:', error);
-            toast.error('Failed to load contests');
+            showError('Failed to load contests');
         } finally {
             setLoading(false);
         }
@@ -46,10 +46,10 @@ export default function ContestManagement() {
                 .eq('id', id);
 
             if (error) throw error;
-            toast.success('Contest deleted');
+            showSuccess('Contest deleted');
             fetchContests();
         } catch (error) {
-            toast.error('Failed to delete contest');
+            showError('Failed to delete contest');
         }
     };
 

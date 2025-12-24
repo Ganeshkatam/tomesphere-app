@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Book } from '@/lib/supabase';
 import { Download, Upload, Trash2, Star, Tag, CheckSquare, Square } from 'lucide-react';
 import Papa from 'papaparse';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { supabase } from '@/lib/supabase';
 
 interface BulkActionsPanelProps {
@@ -42,7 +42,7 @@ export default function BulkActionsPanel({
     // Bulk Delete
     const handleBulkDelete = async () => {
         if (selectedBooks.length === 0) {
-            toast.error('No books selected');
+            showError('No books selected');
             return;
         }
 
@@ -59,12 +59,12 @@ export default function BulkActionsPanel({
 
             if (error) throw error;
 
-            toast.success(`${selectedBooks.length} book(s) deleted successfully`);
+            showSuccess(`${selectedBooks.length} book(s) deleted successfully`);
             onSelectionChange([]);
             onBooksUpdated();
         } catch (error) {
             console.error('Bulk delete error:', error);
-            toast.error('Failed to delete books');
+            showError('Failed to delete books');
         } finally {
             setProcessing(false);
         }
@@ -73,7 +73,7 @@ export default function BulkActionsPanel({
     // Bulk Feature/Unfeature
     const handleBulkFeature = async (featured: boolean) => {
         if (selectedBooks.length === 0) {
-            toast.error('No books selected');
+            showError('No books selected');
             return;
         }
 
@@ -86,14 +86,14 @@ export default function BulkActionsPanel({
 
             if (error) throw error;
 
-            toast.success(
+            showSuccess(
                 `${selectedBooks.length} book(s) ${featured ? 'featured' : 'unfeatured'} successfully`
             );
             onSelectionChange([]);
             onBooksUpdated();
         } catch (error) {
             console.error('Bulk feature error:', error);
-            toast.error('Failed to update books');
+            showError('Failed to update books');
         } finally {
             setProcessing(false);
         }
@@ -102,12 +102,12 @@ export default function BulkActionsPanel({
     // Bulk Genre Change
     const handleBulkGenreChange = async () => {
         if (selectedBooks.length === 0) {
-            toast.error('No books selected');
+            showError('No books selected');
             return;
         }
 
         if (!newGenre) {
-            toast.error('Please select a genre');
+            showError('Please select a genre');
             return;
         }
 
@@ -120,14 +120,14 @@ export default function BulkActionsPanel({
 
             if (error) throw error;
 
-            toast.success(`${selectedBooks.length} book(s) updated to ${newGenre}`);
+            showSuccess(`${selectedBooks.length} book(s) updated to ${newGenre}`);
             onSelectionChange([]);
             setShowGenreSelector(false);
             setNewGenre('');
             onBooksUpdated();
         } catch (error) {
             console.error('Bulk genre change error:', error);
-            toast.error('Failed to update genres');
+            showError('Failed to update genres');
         } finally {
             setProcessing(false);
         }
@@ -136,7 +136,7 @@ export default function BulkActionsPanel({
     // Export Selected to CSV
     const handleExportSelected = () => {
         if (selectedBooks.length === 0) {
-            toast.error('No books selected');
+            showError('No books selected');
             return;
         }
 
@@ -149,7 +149,7 @@ export default function BulkActionsPanel({
         link.download = `books-export-${Date.now()}.csv`;
         link.click();
         URL.revokeObjectURL(url);
-        toast.success(`${selectedBooks.length} book(s) exported`);
+        showSuccess(`${selectedBooks.length} book(s) exported`);
     };
 
     // Import from CSV
@@ -175,7 +175,7 @@ export default function BulkActionsPanel({
                         }));
 
                     if (booksToImport.length === 0) {
-                        toast.error('No valid books found in CSV');
+                        showError('No valid books found in CSV');
                         setProcessing(false);
                         return;
                     }
@@ -186,11 +186,11 @@ export default function BulkActionsPanel({
 
                     if (error) throw error;
 
-                    toast.success(`${booksToImport.length} book(s) imported successfully`);
+                    showSuccess(`${booksToImport.length} book(s) imported successfully`);
                     onBooksUpdated();
                 } catch (error) {
                     console.error('CSV import error:', error);
-                    toast.error('Failed to import books');
+                    showError('Failed to import books');
                 } finally {
                     setProcessing(false);
                     event.target.value = '';
@@ -198,7 +198,7 @@ export default function BulkActionsPanel({
             },
             error: (error) => {
                 console.error('CSV parse error:', error);
-                toast.error('Failed to parse CSV file');
+                showError('Failed to parse CSV file');
                 setProcessing(false);
                 event.target.value = '';
             },

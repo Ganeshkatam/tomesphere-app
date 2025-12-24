@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 import { ArrowLeft, BookOpen, Brain, Trophy } from 'lucide-react';
 
 interface ExamStats {
@@ -46,7 +46,7 @@ export default function ExamPrepPage() {
                 totalFlashcards: flashcardsResult.data?.length || 0
             });
         } catch (error: any) {
-            toast.error('Failed to load stats');
+            showError('Failed to load stats');
         } finally {
             setLoading(false);
         }

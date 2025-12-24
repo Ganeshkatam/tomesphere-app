@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, Users } from 'lucide-react';
 
 export default function CreateGroupPage() {
@@ -27,7 +27,7 @@ export default function CreateGroupPage() {
         e.preventDefault();
 
         if (!form.name) {
-            toast.error('Please enter a group name');
+            showError('Please enter a group name');
             return;
         }
 
@@ -67,10 +67,10 @@ export default function CreateGroupPage() {
 
             if (memberError) throw memberError;
 
-            toast.success('Group created!');
+            showSuccess('Group created!');
             router.push(`/study-groups/${group.id}`);
         } catch (error: any) {
-            toast.error('Failed to create group');
+            showError('Failed to create group');
         } finally {
             setLoading(false);
         }

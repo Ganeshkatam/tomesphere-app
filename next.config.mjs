@@ -4,6 +4,14 @@ import withPWA from 'next-pwa';
 const nextConfig = {
     reactStrictMode: true,
     turbopack: {}, // Empty turbopack config to silence warning
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: '**', // Allow all domains to fix image loading issues
+            }
+        ],
+    },
 };
 
 const pwaConfig = withPWA({

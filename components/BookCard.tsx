@@ -1,6 +1,7 @@
 import { Book } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { Heart, Star, Plus, BookOpen, Clock, Check } from 'lucide-react';
 import { generateSimpleDescription } from '@/lib/pdf-description-generator';
 
@@ -68,17 +69,17 @@ export default function BookCard({
                     />
                 )}
                 {book.cover_url ? (
-                    <img
+                    <Image
                         src={book.cover_url}
                         alt={book.title}
-                        className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}
+                        fill
+                        unoptimized // Bypass Next.js proxy to fix "private IP" error and allow direct loading
+                        placeholder="blur"
+                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAFCAYAAABir53AAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGklEQVR4nGP8////fwYGBgYGRkZGhjNnzgAAK8QD87779+AAAAAASUVORK5CYII=" // simple blur
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
+                        className={`object-cover transition-all duration-700 ${imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}
                         onLoad={() => setImageLoaded(true)}
-                        onError={(e) => {
-                            // Hide failed image and show default cover
-                            e.currentTarget.style.display = 'none';
-                            setImageLoaded(true);
-                        }}
-                        loading="lazy"
+                        onError={() => setImageLoaded(true)}
                     />
                 ) : null}
 
@@ -121,25 +122,25 @@ export default function BookCard({
             </div>
 
             {/* Book Info */}
-            <div className="p-4 flex-1 flex flex-col">
-                <h3 className="text-base font-bold text-white line-clamp-2 mb-1 group-hover:text-primary-light transition-colors">
+            <div className="p-3 flex-1 flex flex-col">
+                <h3 className="text-sm font-bold text-white line-clamp-2 mb-0.5 group-hover:text-primary-light transition-colors leading-tight">
                     {book.title}
                 </h3>
-                <p className="text-sm text-slate-400 mb-3">by {book.author}</p>
+                <p className="text-xs text-slate-400 mb-2">by {book.author}</p>
 
                 <div className="flex items-center gap-2 mb-auto">
-                    <span className="px-2.5 py-1 bg-primary/20 text-primary-light rounded-lg text-xs font-medium border border-primary/30">
+                    <span className="px-2 py-0.5 bg-primary/20 text-primary-light rounded text-[10px] font-medium border border-primary/30">
                         {book.genre}
                     </span>
                     {book.release_date && (
-                        <span className="text-xs text-slate-500">
+                        <span className="text-[10px] text-slate-500">
                             {new Date(book.release_date).getFullYear()}
                         </span>
                     )}
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 pt-4 border-t border-white/5 mt-4">
+                <div className="flex items-center gap-2 pt-2 border-t border-white/5 mt-2">
                     {/* Like Button */}
                     {onLike && (
                         <button

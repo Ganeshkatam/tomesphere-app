@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, Edit, Trash2, Eye, DollarSign } from 'lucide-react';
 
 interface Listing {
@@ -43,7 +43,7 @@ export default function MyListingsPage() {
             if (error) throw error;
             setListings(data || []);
         } catch (error: any) {
-            toast.error('Failed to load listings');
+            showError('Failed to load listings');
         } finally {
             setLoading(false);
         }
@@ -60,10 +60,10 @@ export default function MyListingsPage() {
 
             if (error) throw error;
 
-            toast.success('Listing deleted');
+            showSuccess('Listing deleted');
             fetchMyListings();
         } catch (error: any) {
-            toast.error('Failed to delete listing');
+            showError('Failed to delete listing');
         }
     };
 
@@ -76,10 +76,10 @@ export default function MyListingsPage() {
 
             if (error) throw error;
 
-            toast.success('Marked as sold');
+            showSuccess('Marked as sold');
             fetchMyListings();
         } catch (error: any) {
-            toast.error('Failed to update listing');
+            showError('Failed to update listing');
         }
     };
 

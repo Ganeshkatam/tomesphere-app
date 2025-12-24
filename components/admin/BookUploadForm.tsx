@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { generateSimpleDescription } from '@/lib/pdf-description-generator';
 import { Sparkles } from 'lucide-react';
 import { logAdminAction } from '@/lib/audit';
@@ -40,13 +40,13 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
-            toast.error('Please upload an image file');
+            showError('Please upload an image file');
             return;
         }
 
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
-            toast.error('Image size must be less than 5MB');
+            showError('Image size must be less than 5MB');
             return;
         }
 
@@ -65,12 +65,12 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
 
         // Validate file size (max 100MB for any file type)
         if (file.size > 100 * 1024 * 1024) {
-            toast.error('File size must be less than 100MB');
+            showError('File size must be less than 100MB');
             return;
         }
 
         setPdfFile(file);
-        toast.success(`Selected: ${file.name}`);
+        showSuccess(`Selected: ${file.name}`);
     };
 
     const uploadFile = async (file: File, bucket: string, folder: string): Promise<string> => {
@@ -140,7 +140,7 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
                 setUploadProgress({ ...uploadProgress, cover: 50 });
                 coverUrl = await uploadFile(coverFile, 'book-covers', 'covers');
                 setUploadProgress({ ...uploadProgress, cover: 100 });
-                toast.success('Cover uploaded!');
+                showSuccess('Cover uploaded!');
             }
 
             // Upload PDF/EPUB if file is selected
@@ -148,7 +148,7 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
                 setUploadProgress({ ...uploadProgress, pdf: 50 });
                 pdfUrl = await uploadFile(pdfFile, 'book-pdfs', 'files');
                 setUploadProgress({ ...uploadProgress, pdf: 100 });
-                toast.success('File uploaded!');
+                showSuccess('File uploaded!');
             }
 
             // Create book record
@@ -190,7 +190,7 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
                 if (audioError) console.error('Error adding audiobook:', audioError);
             }
 
-            toast.success('Book added successfully!');
+            showSuccess('Book added successfully!');
 
             // Reset form
             setFormData({
@@ -215,7 +215,7 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
             onBookAdded();
         } catch (error: any) {
             console.error('Upload error:', error);
-            toast.error(error.message || 'Failed to add book');
+            showError(error.message || 'Failed to add book');
         } finally {
             setLoading(false);
         }
@@ -223,7 +223,7 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
 
     const generateDescription = async () => {
         if (!formData.title) {
-            toast.error('Please enter a title first');
+            showError('Please enter a title first');
             return;
         }
 
@@ -236,9 +236,9 @@ export default function BookUploadForm({ onBookAdded }: BookUploadFormProps) {
             );
 
             setFormData({ ...formData, description });
-            toast.success('Description generated!');
+            showSuccess('Description generated!');
         } catch (error) {
-            toast.error('Failed to generate description');
+            showError('Failed to generate description');
         } finally {
             setGeneratingDescription(false);
         }

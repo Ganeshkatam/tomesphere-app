@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase, Review } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 interface ReviewWithDetails extends Review {
     book_title?: string;
@@ -46,7 +46,7 @@ export default function ReviewModeration() {
             setReviews(reviewsWithDetails);
             setLoading(false);
         } catch (error) {
-            toast.error('Failed to load reviews');
+            showError('Failed to load reviews');
             setLoading(false);
         }
     };
@@ -63,9 +63,9 @@ export default function ReviewModeration() {
             setReviews(prev =>
                 prev.map(r => (r.id === reviewId ? { ...r, flagged: !currentFlag } : r))
             );
-            toast.success(currentFlag ? 'Review unflagged' : 'Review flagged');
+            showSuccess(currentFlag ? 'Review unflagged' : 'Review flagged');
         } catch (error) {
-            toast.error('Failed to update review');
+            showError('Failed to update review');
         }
     };
 
@@ -81,9 +81,9 @@ export default function ReviewModeration() {
             if (error) throw error;
 
             setReviews(prev => prev.filter(r => r.id !== reviewId));
-            toast.success('Review deleted');
+            showSuccess('Review deleted');
         } catch (error) {
-            toast.error('Failed to delete review');
+            showError('Failed to delete review');
         }
     };
 

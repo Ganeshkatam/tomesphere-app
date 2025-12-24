@@ -16,7 +16,7 @@ import {
     Download
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
-import toast from 'react-hot-toast';
+import { showSuccess } from '@/lib/toast';
 import { usePWA } from '@/lib/pwa-context';
 
 export default function QuickAccessSidebar() {
@@ -55,7 +55,7 @@ export default function QuickAccessSidebar() {
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        toast.success('Logged out successfully');
+        showSuccess('Logged out successfully');
         setIsOpen(false);
         router.push('/');
     };

@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar';
 import ContestCard, { Contest } from '@/components/ContestCard';
 import { supabase } from '@/lib/supabase';
 import { Trophy, Flame, Calendar, History } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 
 export default function ContestsPage() {
     const [activeTab, setActiveTab] = useState<'active' | 'upcoming' | 'past'>('active');
@@ -29,7 +29,7 @@ export default function ContestsPage() {
             setContests(data || []);
         } catch (error) {
             console.error('Error fetching contests:', error);
-            toast.error('Failed to load contests');
+            showError('Failed to load contests');
         } finally {
             setLoading(false);
         }
@@ -37,7 +37,7 @@ export default function ContestsPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role="user" currentPage="/contests" />
 
             <div className="max-w-7xl mx-auto px-4 py-12">

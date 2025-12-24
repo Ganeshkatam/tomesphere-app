@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, BookOpen, Bookmark, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Sun, Moon, Volume2, VolumeX, Settings, Menu, X, List } from 'lucide-react';
 
 interface Book {
@@ -78,7 +78,7 @@ export default function ReadingPage() {
             setBook(data);
             setLoading(false);
         } catch (error) {
-            toast.error('Failed to load book');
+            showError('Failed to load book');
             setLoading(false);
         }
     };
@@ -161,7 +161,7 @@ export default function ReadingPage() {
             if (isFinished) {
                 const { awardPoints } = await import('@/lib/gamification');
                 const points = await awardPoints(user.id, 'bookRead');
-                if (points > 0) toast.success(`🎉 Completed! +${points} XP`);
+                if (points > 0) showSuccess(`🎉 Completed! +${points} XP`);
             }
         } catch (error) {
             console.error('Failed to save progress', error);
@@ -180,7 +180,7 @@ export default function ReadingPage() {
                     .eq('user_id', user.id)
                     .eq('book_id', bookId)
                     .eq('page_number', currentPage);
-                toast.success('Bookmark removed');
+                showSuccess('Bookmark removed');
             } else {
                 await supabase.from('bookmarks').insert({
                     user_id: user.id,
@@ -188,11 +188,11 @@ export default function ReadingPage() {
                     page_number: currentPage,
                     label: `Page ${currentPage}`
                 });
-                toast.success('Page bookmarked');
+                showSuccess('Page bookmarked');
             }
             loadBookmarks(); // Reload list
         } catch (error) {
-            toast.error('Failed to bookmark');
+            showError('Failed to bookmark');
         }
     };
 
@@ -210,7 +210,7 @@ export default function ReadingPage() {
                 setIsReading(true);
             }
         } else {
-            toast.error('Text-to-speech not supported');
+            showError('Text-to-speech not supported');
         }
     };
 

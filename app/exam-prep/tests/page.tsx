@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 import { ArrowLeft, Clock, Award } from 'lucide-react';
 
 interface PracticeTest {
@@ -40,7 +40,7 @@ export default function PracticeTestsPage() {
             if (error) throw error;
             setTests(data || []);
         } catch (error: any) {
-            toast.error('Failed to load tests');
+            showError('Failed to load tests');
         } finally {
             setLoading(false);
         }

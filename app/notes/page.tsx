@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 import { ArrowLeft, Plus, FileText, Tag, Download, Target } from 'lucide-react';
 import VoiceInput from '@/components/ui/VoiceInput';
 import StudentNav from '@/components/StudentNav';
@@ -45,7 +45,7 @@ export default function NotesPage() {
             if (error) throw error;
             setNotes(data || []);
         } catch (error: any) {
-            toast.error('Failed to load notes');
+            showError('Failed to load notes');
         } finally {
             setLoading(false);
         }

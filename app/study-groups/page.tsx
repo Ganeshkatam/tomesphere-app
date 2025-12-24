@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, Plus, Users, Lock } from 'lucide-react';
 
 interface StudyGroup {
@@ -43,7 +43,7 @@ export default function StudyGroupsPage() {
             if (error) throw error;
             setGroups(data || []);
         } catch (error: any) {
-            toast.error('Failed to load groups');
+            showError('Failed to load groups');
         } finally {
             setLoading(false);
         }
@@ -65,10 +65,10 @@ export default function StudyGroupsPage() {
 
             if (error) throw error;
 
-            toast.success('Joined group!');
+            showSuccess('Joined group!');
             router.push(`/study-groups/${groupId}`);
         } catch (error: any) {
-            toast.error('Failed to join group');
+            showError('Failed to join group');
         }
     };
 

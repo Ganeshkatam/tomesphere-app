@@ -7,7 +7,7 @@ import Navbar from '@/components/Navbar';
 import BookCard from '@/components/BookCard';
 import VoiceInput from '@/components/ui/VoiceInput';
 
-import toast, { Toaster } from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 
 export default function LibraryClient() {
     const router = useRouter();
@@ -46,7 +46,7 @@ export default function LibraryClient() {
             setLoading(false);
         } catch (error) {
             console.error('Error loading library:', error);
-            toast.error('Failed to load library');
+            showError('Failed to load library');
             setLoading(false);
         }
     };
@@ -61,7 +61,7 @@ export default function LibraryClient() {
 
     return (
         <div className="min-h-screen bg-gradient-page">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role={user?.role || 'user'} currentPage="/library" />
 
             <div className="max-w-7xl mx-auto px-4 py-8">

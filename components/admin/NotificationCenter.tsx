@@ -2,7 +2,7 @@
 
 import { Bell, Send } from 'lucide-react';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { showSuccess } from '@/lib/toast';
 import { supabase } from '@/lib/supabase';
 
 export default function NotificationCenter() {
@@ -16,7 +16,7 @@ export default function NotificationCenter() {
             title, body, sent_to: ['all'], sent_at: new Date().toISOString()
         });
 
-        toast.success('Notification sent!');
+        showSuccess('Notification sent!');
         setTitle('');
         setBody('');
     };

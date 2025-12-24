@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, getCurrentUser, Profile } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import {
     BookOpen, Star, TrendingUp, Zap, Trophy, Flame, Crown, Sparkles, MessageSquare, Globe,
     Linkedin, Twitter, Github, Mail, Calendar, UserPlus, UserMinus, User, ArrowLeft, Clock, Users
 } from 'lucide-react';
 
-export default function PublicProfilePage({ params }: { params: { id: string } }) {
+export default async function PublicProfilePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const router = useRouter();
     const [profile, setProfile] = useState<Profile | null>(null);
     const [currentUser, setCurrentUser] = useState<any>(null);
@@ -30,7 +31,7 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
 
     useEffect(() => {
         loadProfile();
-    }, [params.id]);
+    }, [id]);
 
     const loadProfile = async () => {
         try {
@@ -41,11 +42,11 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
             const { data: profileData, error } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', params.id)
+                .eq('id', id)
                 .single();
 
             if (error) {
-                toast.error('User not found');
+                showError('User not found');
                 router.push('/community');
                 return;
             }
@@ -56,7 +57,7 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
             const { count: booksReadCount } = await supabase
                 .from('reading_lists')
                 .select('*', { count: 'exact', head: true })
-                .eq('user_id', params.id)
+                .eq('user_id', id)
                 .eq('status', 'completed');
 
             // 2. Reading Streak (from profiles table if you have it, or calc from logs - defaulting to profile field or 0)
@@ -67,12 +68,12 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
             const { count: followers } = await supabase
                 .from('user_follows')
                 .select('*', { count: 'exact', head: true })
-                .eq('following_id', params.id);
+                .eq('following_id', id);
 
             const { count: following } = await supabase
                 .from('user_follows')
                 .select('*', { count: 'exact', head: true })
-                .eq('follower_id', params.id);
+                .eq('follower_id', id);
 
             setFollowersCount(followers || 0);
             setFollowingCount(following || 0);
@@ -90,12 +91,12 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
             });
 
             // Check following status
-            if (user && user.id !== params.id) {
+            if (user && user.id !== id) {
                 const { data: followData } = await supabase
                     .from('user_follows')
                     .select('*')
                     .eq('follower_id', user.id)
-                    .eq('following_id', params.id)
+                    .eq('following_id', id)
                     .single();
                 setIsFollowing(!!followData);
             }
@@ -115,13 +116,13 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
         try {
             await supabase.from('user_follows').insert({
                 follower_id: currentUser.id,
-                following_id: params.id
+                following_id: id
             });
             setIsFollowing(true);
             setFollowersCount(prev => prev + 1);
-            toast.success('Followed user!');
+            showSuccess(`Followed ${profile?.name}`);
         } catch (error) {
-            toast.error('Failed to follow');
+            showError('Failed to follow user');
         }
     };
 
@@ -130,12 +131,12 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
         try {
             await supabase.from('user_follows').delete()
                 .eq('follower_id', currentUser.id)
-                .eq('following_id', params.id);
+                .eq('following_id', id);
             setIsFollowing(false);
             setFollowersCount(prev => Math.max(0, prev - 1));
-            toast.success('Unfollowed user');
+            showSuccess(`Unfollowed ${profile?.name}`);
         } catch (error) {
-            toast.error('Failed to unfollow');
+            showError('Failed to unfollow user');
         }
     };
 
@@ -144,7 +145,7 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
             router.push('/login');
             return;
         }
-        router.push(`/messages/${params.id}`);
+        router.push(`/messages/${id}`);
     };
 
     if (loading) {
@@ -159,7 +160,7 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
 
     return (
         <div className="min-h-screen bg-gradient-page">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role="user" currentPage="/community" />
 
             <div className="max-w-7xl mx-auto px-4 py-8">
@@ -237,7 +238,7 @@ export default function PublicProfilePage({ params }: { params: { id: string } }
                             </div>
 
                             {/* Actions */}
-                            {currentUser && currentUser.id !== params.id && (
+                            {currentUser && currentUser.id !== id && (
                                 <div className="flex flex-col gap-3 min-w-[160px]">
                                     {isFollowing ? (
                                         <button

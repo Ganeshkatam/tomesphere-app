@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, Clock, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Test {
@@ -80,7 +80,7 @@ export default function TakeTestPage() {
             if (questionsError) throw questionsError;
             setQuestions(questionsData || []);
         } catch (error: any) {
-            toast.error('Failed to load test');
+            showError('Failed to load test');
             router.push('/exam-prep/tests');
         } finally {
             setLoading(false);
@@ -121,17 +121,17 @@ export default function TakeTestPage() {
                 let points = 0;
                 if (percentage >= 80) {
                     points = await awardPoints(user.id, 'challengeWon');
-                    toast.success(`🏆 Ace! +${points} XP`);
+                    showSuccess(`🏆 Ace! +${points} XP`);
                 } else if (percentage >= 50) {
                     points = await awardPoints(user.id, 'goalCompleted');
-                    toast.success(`👍 Passed! +${points} XP`);
+                    showSuccess(`👍 Passed! +${points} XP`);
                 }
             }
         } catch (error) {
             console.error('Failed to save test attempt:', error);
         }
 
-        toast.success(`Test submitted! Score: ${percentage.toFixed(1)}%`);
+        showSuccess(`Test submitted! Score: ${percentage.toFixed(1)}%`);
     };
 
     const formatTime = (seconds: number) => {

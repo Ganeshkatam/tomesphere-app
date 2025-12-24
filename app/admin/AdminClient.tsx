@@ -11,7 +11,6 @@ import ReviewModeration from '@/components/admin/ReviewModeration';
 import AnalyticsDashboard from '@/components/admin/analytics/AnalyticsDashboard';
 import BulkActionsPanel from '@/components/admin/BulkActionsPanel';
 import ActivityLogs from '@/components/admin/ActivityLogs';
-import toast, { Toaster } from 'react-hot-toast';
 import { showError, showSuccess } from '@/lib/toast';
 import {
     TrendingUp, TrendingDown, Users, BookOpen, Star, Clock,
@@ -242,7 +241,7 @@ export default function AdminPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role="admin" currentPage="/admin" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

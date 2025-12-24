@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, Compass, Book, Users, User, LogOut, Menu, X, Download, Shield } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { useEffect, useState } from 'react';
 import NotificationCenter from '@/components/NotificationCenter';
 import ThemeToggle from './ThemeToggle';
@@ -41,12 +41,12 @@ export default function Navbar({ role, currentPage }: NavbarProps) {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            toast.success('Logged out successfully');
+            showSuccess('Logged out successfully');
             setMobileMenuOpen(false);
             router.push('/');
         } catch (error: any) {
             console.error('Logout error:', error);
-            toast.error('Failed to logout');
+            showError('Error logging out');
         }
     };
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 export default function ProfileSetupPage() {
     const [loading, setLoading] = useState(false);
@@ -55,12 +55,12 @@ export default function ProfileSetupPage() {
         e.preventDefault();
 
         if (!formData.name.trim()) {
-            toast.error('Please enter your name');
+            showError('Please check your network settings');
             return;
         }
 
         if (formData.favoriteGenres.length === 0) {
-            toast.error('Please select at least one favorite genre');
+            showError('Please select at least one favorite genre');
             return;
         }
 
@@ -82,14 +82,14 @@ export default function ProfileSetupPage() {
 
             if (error) throw error;
 
-            toast.success('Profile setup complete! 🎉');
+            showSuccess('Profile setup complete!');
 
             setTimeout(() => {
                 router.push('/home');
             }, 1000);
         } catch (error: any) {
             console.error('Error:', error);
-            toast.error(error.message || 'Failed to save profile');
+            showError(error.message || 'Failed to update profile');
         } finally {
             setLoading(false);
         }
@@ -97,7 +97,7 @@ export default function ProfileSetupPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page flex items-start justify-center p-4 sm:p-6 md:py-12">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
 
             <div className="w-full max-w-2xl">
                 <div className="text-center mb-8 animate-fadeIn">
@@ -153,8 +153,8 @@ export default function ProfileSetupPage() {
                                     type="button"
                                     onClick={() => toggleGenre(genre)}
                                     className={`px-4 py-2 rounded-lg border transition-all ${formData.favoriteGenres.includes(genre)
-                                            ? 'bg-primary border-primary text-white'
-                                            : 'border-white/10 hover:border-white/20'
+                                        ? 'bg-primary border-primary text-white'
+                                        : 'border-white/10 hover:border-white/20'
                                         }`}
                                 >
                                     {genre}

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase, Book } from '@/lib/supabase';
 import BookCard from '@/components/BookCard';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, BookOpen, GraduationCap } from 'lucide-react';
 
 const ACADEMIC_SUBJECTS = [
@@ -50,7 +50,7 @@ export default function AcademicLibraryPage() {
     const handleUpload = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) {
-            toast.error('Please login to upload');
+            showError('Please login to upload');
             router.push('/login');
             return;
         }
@@ -83,12 +83,12 @@ export default function AcademicLibraryPage() {
 
             if (dbError) throw dbError;
 
-            toast.success('Resource uploaded successfully!');
+            showSuccess('Resource uploaded successfully!');
             setShowUploadModal(false);
             setUploadForm({ title: '', author: '', subject: 'Computer Science', file: null });
             fetchBooks();
         } catch (error: any) {
-            toast.error('Upload failed: ' + error.message);
+            showError('Upload failed: ' + error.message);
         } finally {
             setUploading(false);
         }
@@ -111,7 +111,7 @@ export default function AcademicLibraryPage() {
             if (error) throw error;
             setBooks(data || []);
         } catch (error: any) {
-            toast.error('Failed to load academic books');
+            showError('Failed to load academic books');
         } finally {
             setLoading(false);
         }
@@ -119,35 +119,35 @@ export default function AcademicLibraryPage() {
 
     const handleLike = async (bookId: string) => {
         if (!user) {
-            toast.error('Please sign in to like books');
+            showError('Please sign in to like books');
             router.push('/login');
             return;
         }
 
         // Like logic here
-        toast.success('Book liked!');
+        showSuccess('Book liked!');
     };
 
     const handleRate = async (bookId: string, rating: number) => {
         if (!user) {
-            toast.error('Please sign in to rate books');
+            showError('Please sign in to rate books');
             router.push('/login');
             return;
         }
 
         // Rating logic here
-        toast.success(`Rated ${rating} stars!`);
+        showSuccess(`Rated ${rating} stars!`);
     };
 
     const handleAddToList = async (bookId: string, status: string) => {
         if (!user) {
-            toast.error('Please sign in to add to reading list');
+            showError('Please sign in to add to reading list');
             router.push('/login');
             return;
         }
 
         // Add to list logic
-        toast.success(`Added to ${status}!`);
+        showSuccess(`Added to ${status}!`);
     };
 
     return (

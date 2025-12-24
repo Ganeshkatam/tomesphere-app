@@ -6,7 +6,7 @@ import { supabase, getCurrentUser, Profile } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 
 import MFASetup from '@/components/MFASetup';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import {
     BookOpen, Star, TrendingUp, Zap, Trophy, Flame, Crown, Sparkles, Save, X, Globe,
     Linkedin, Twitter, Github, Lock, Bell, Eye, Target, BarChart3, Camera, Upload, Clock,
@@ -158,7 +158,7 @@ export default function ProfilePage() {
             // Only update phone_number if it was originally empty (one-time update)
             if (!originalPhone && formData.phone_number) {
                 updateData.phone_number = formData.phone_number;
-                toast.success('Phone number saved! Future changes require verification.');
+                showSuccess('Phone number saved! Future changes require verification.');
             }
 
             const { error } = await supabase
@@ -167,12 +167,12 @@ export default function ProfilePage() {
                 .eq('id', user.id);
 
             if (error) throw error;
-            toast.success('Profile updated successfully!');
+            showSuccess('Profile updated successfully!');
             setActiveTab('overview');
             await initializePage();
         } catch (error) {
             console.error('Error:', error);
-            toast.error('Failed to update profile');
+            showError('Failed to update profile');
         } finally {
             setSaving(false);
         }
@@ -214,7 +214,7 @@ export default function ProfilePage() {
 
         } catch (error) {
             console.error('Error loading network:', error);
-            toast.error('Failed to load network');
+            showError('Failed to load network');
         } finally {
             setNetworkLoading(false);
         }
@@ -232,11 +232,11 @@ export default function ProfilePage() {
                 follower_id: user.id,
                 following_id: targetId
             });
-            toast.success('Followed user!');
+            showSuccess('Followed user!');
             loadNetworkData(); // Refresh list
             setFollowingCount(prev => prev + 1);
         } catch (error) {
-            toast.error('Failed to follow');
+            showError('Failed to follow');
         }
     };
 
@@ -245,11 +245,11 @@ export default function ProfilePage() {
             await supabase.from('user_follows').delete()
                 .eq('follower_id', user.id)
                 .eq('following_id', targetId);
-            toast.success('Unfollowed user');
+            showSuccess('Unfollowed user');
             loadNetworkData(); // Refresh list
             setFollowingCount(prev => Math.max(0, prev - 1));
         } catch (error) {
-            toast.error('Failed to unfollow');
+            showError('Failed to unfollow');
         }
     };
 
@@ -267,7 +267,7 @@ export default function ProfilePage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950">
             <Navbar />
-            <Toaster position="top-center" />
+            {/* <Toaster position="top-center" /> */}
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header Card */}

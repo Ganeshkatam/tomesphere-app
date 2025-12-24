@@ -6,16 +6,17 @@ import { supabase } from '@/lib/supabase';
 import { ArrowLeft, BookOpen, Share2, Heart, Bookmark } from 'lucide-react';
 import AudioPlayer from '@/components/AudioPlayer';
 import Navbar from '@/components/Navbar';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
-export default function ListenPage({ params }: { params: { id: string } }) {
+export default async function ListenPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const [audiobook, setAudiobook] = useState<any>(null);
     const [book, setBook] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadAudiobook();
-    }, [params.id]);
+    }, [id]);
 
     const loadAudiobook = async () => {
         try {
@@ -23,14 +24,14 @@ export default function ListenPage({ params }: { params: { id: string } }) {
             const { data: audioData, error: audioError } = await supabase
                 .from('audiobooks')
                 .select('*')
-                .eq('book_id', params.id)
+                .eq('book_id', id)
                 .single();
 
             // Fetch book details
             const { data: bookData } = await supabase
                 .from('books')
                 .select('*')
-                .eq('id', params.id)
+                .eq('id', id)
                 .single();
 
             setBook(bookData);
@@ -38,7 +39,7 @@ export default function ListenPage({ params }: { params: { id: string } }) {
             if (audioData) {
                 setAudiobook(audioData);
             } else {
-                toast.error('Audiobook not found');
+                showError('Audiobook not found');
             }
         } catch (error) {
             console.error('Error loading audiobook:', error);
@@ -55,7 +56,7 @@ export default function ListenPage({ params }: { params: { id: string } }) {
         if (position === -1) {
             const { awardPoints } = await import('@/lib/gamification');
             const points = await awardPoints((await supabase.auth.getUser()).data.user?.id!, 'bookRead');
-            toast.success(`🎉 Audiobook Completed! +${points} XP`);
+            showSuccess(`🎉 Audiobook Completed! +${points} XP`);
             return;
         }
 

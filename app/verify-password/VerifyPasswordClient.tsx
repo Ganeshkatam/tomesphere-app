@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 function VerifyPasswordForm() {
     const [password, setPassword] = useState('');
@@ -39,7 +39,7 @@ function VerifyPasswordForm() {
                     .eq('id', authData.user.id)
                     .single();
 
-                toast.success('Welcome back!');
+                showSuccess('Welcome back!');
 
                 setTimeout(() => {
                     if (profile?.role === 'admin') {
@@ -50,7 +50,7 @@ function VerifyPasswordForm() {
                 }, 500);
             }
         } catch (error: any) {
-            toast.error('Incorrect password');
+            showError('Incorrect password');
         } finally {
             setLoading(false);
         }
@@ -65,7 +65,7 @@ function VerifyPasswordForm() {
 
     return (
         <div className="min-h-screen bg-gradient-page flex items-start justify-center p-4 sm:p-6 md:py-12">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
 
             <div className="w-full max-w-md animate-fadeIn">
                 <div className="text-center mb-8">

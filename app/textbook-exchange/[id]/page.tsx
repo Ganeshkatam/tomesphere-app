@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, Book, DollarSign, Heart, User } from 'lucide-react';
 
 interface Listing {
@@ -47,7 +47,7 @@ export default function ListingDetailPage() {
             setListing(data);
             setOfferPrice(data.price.toString());
         } catch (error: any) {
-            toast.error('Failed to load listing');
+            showError('Failed to load listing');
         } finally {
             setLoading(false);
         }
@@ -69,9 +69,9 @@ export default function ListingDetailPage() {
                 });
 
             if (error) throw error;
-            toast.success('Listing saved!');
+            showSuccess('Listing saved!');
         } catch (error: any) {
-            toast.error('Failed to save listing');
+            showError('Failed to save listing');
         }
     };
 
@@ -97,11 +97,11 @@ export default function ListingDetailPage() {
 
             if (error) throw error;
 
-            toast.success('Offer sent!');
+            showSuccess('Offer sent!');
             setShowOfferModal(false);
             setOfferMessage('');
         } catch (error: any) {
-            toast.error('Failed to send offer');
+            showError('Failed to send offer');
         }
     };
 
@@ -213,7 +213,7 @@ export default function ListingDetailPage() {
                                 <div className="mb-6">
                                     <button
                                         onClick={() => {
-                                            toast.success('Seller will be notified of your interest!');
+                                            showSuccess('Seller will be notified of your interest!');
                                         }}
                                         className="w-full px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-all font-medium text-lg"
                                     >

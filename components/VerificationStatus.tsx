@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Check, X, Loader2, RefreshCw } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 export default function VerificationStatus() {
     const [status, setStatus] = useState({
@@ -50,8 +50,8 @@ export default function VerificationStatus() {
             type: 'signup',
             email: (await supabase.auth.getUser()).data.user?.email || ''
         });
-        if (error) toast.error('Failed to send email');
-        else toast.success('Verification email sent!');
+        if (error) showError('Failed to send email');
+        else showSuccess('Verification email sent!');
     };
 
     if (status.loading) return <div className="h-20 animate-pulse bg-white/5 rounded-xl" />;

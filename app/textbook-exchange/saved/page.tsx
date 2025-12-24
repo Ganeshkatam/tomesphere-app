@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, Heart, Book, Trash2 } from 'lucide-react';
 
 interface SavedListing {
@@ -45,7 +45,7 @@ export default function SavedListingsPage() {
             if (error) throw error;
             setSavedListings(data || []);
         } catch (error: any) {
-            toast.error('Failed to load saved listings');
+            showError('Failed to load saved listings');
         } finally {
             setLoading(false);
         }
@@ -60,10 +60,10 @@ export default function SavedListingsPage() {
 
             if (error) throw error;
 
-            toast.success('Removed from saved');
+            showSuccess('Removed from saved');
             fetchSavedListings();
         } catch (error: any) {
-            toast.error('Failed to remove');
+            showError('Failed to remove');
         }
     };
 

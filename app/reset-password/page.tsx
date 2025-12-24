@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 export default function ResetPasswordPage() {
     const [password, setPassword] = useState('');
@@ -15,12 +15,12 @@ export default function ResetPasswordPage() {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-            toast.error('Passwords do not match');
+            showError('Passwords do not match');
             return;
         }
 
         if (password.length < 6) {
-            toast.error('Password must be at least 6 characters');
+            showError('Password must be at least 6 characters');
             return;
         }
 
@@ -32,14 +32,14 @@ export default function ResetPasswordPage() {
 
             if (error) throw error;
 
-            toast.success('Password updated successfully!');
+            showSuccess('Password updated successfully!');
 
             setTimeout(() => {
                 router.push('/login');
             }, 1500);
         } catch (error: any) {
             console.error('Error:', error);
-            toast.error(error.message || 'Failed to update password');
+            showError(error.message || 'Failed to update password');
         } finally {
             setLoading(false);
         }
@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page flex items-start justify-center p-4 sm:p-6 md:py-12">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
 
             <div className="w-full max-w-md">
                 {/* Header */}

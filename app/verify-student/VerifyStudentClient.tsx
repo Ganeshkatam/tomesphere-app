@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { Camera, Upload, Check, X, Loader2, School, Mail, FileText, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -53,7 +53,7 @@ export default function VerifyStudentClient() {
             }
         } catch (err) {
             console.error(err);
-            toast.error('Could not access camera');
+            showError('Could not access camera');
         }
     };
 
@@ -123,10 +123,10 @@ export default function VerifyStudentClient() {
             if (insertError) throw insertError;
 
             setStep('success');
-            toast.success('Verification submitted!');
+            showSuccess('Verification request submitted!');
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || 'Submission failed');
+            showError(error.message || 'Submission failed');
         } finally {
             setLoading(false);
         }
@@ -135,7 +135,7 @@ export default function VerifyStudentClient() {
     return (
         <div className="min-h-screen bg-gradient-page">
             <Navbar role="user" currentPage="/verify-student" />
-            <Toaster position="top-center" />
+            {/* <Toaster position="top-right" /> */}
 
             <div className="max-w-2xl mx-auto px-4 py-8">
                 <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">

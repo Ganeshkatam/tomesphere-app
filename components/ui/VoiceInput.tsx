@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 
 interface VoiceInputProps {
     onTranscript: (text: string) => void;
@@ -44,7 +44,7 @@ export default function VoiceInput({
 
     const startListening = () => {
         if (!isSupported) {
-            toast.error('Voice input is not supported in this browser.');
+            showError('Voice input is not supported in this browser.');
             return;
         }
 
@@ -94,7 +94,7 @@ export default function VoiceInput({
             recognition.onerror = (event: any) => {
                 console.error('Speech recognition error', event.error);
                 if (event.error === 'not-allowed') {
-                    toast.error('Microphone access denied.');
+                    showError('Microphone access denied.');
                 }
                 stopListening();
             };
@@ -135,8 +135,8 @@ export default function VoiceInput({
             onClick={toggleListening}
             type="button"
             className={`p-2 rounded-full transition-all duration-300 flex items-center justify-center ${isListening
-                    ? 'bg-red-500/20 text-red-500 animate-pulse shadow-lg shadow-red-500/20 ring-2 ring-red-500/50'
-                    : 'text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10'
+                ? 'bg-red-500/20 text-red-500 animate-pulse shadow-lg shadow-red-500/20 ring-2 ring-red-500/50'
+                : 'text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10'
                 } ${className}`}
             title={isListening ? "Stop listening" : "Start voice search"}
         >

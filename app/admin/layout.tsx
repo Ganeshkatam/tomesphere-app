@@ -14,7 +14,7 @@ import {
     X,
     Settings
 } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 .single();
 
             if (error || profile?.role !== 'admin') {
-                toast.error('Unauthorized access');
+                showError('Unauthorized access');
                 router.replace('/home');
                 return;
             }
@@ -77,7 +77,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-indigo-500/30">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
 
             {/* Mobile Sidebar Toggle */}
             <div className="lg:hidden fixed top-4 left-4 z-50">
@@ -110,8 +110,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                     key={item.name}
                                     href={item.href}
                                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                                            : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                                        : 'text-slate-400 hover:bg-white/5 hover:text-white'
                                         }`}
                                 >
                                     <item.icon size={20} className={isActive ? 'text-white' : 'text-slate-500 group-hover:text-indigo-400 transition-colors'} />

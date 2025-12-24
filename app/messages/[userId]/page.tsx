@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar';
 import { supabase, DirectMessage, getUserProfile } from '@/lib/supabase';
 import { useRouter } from 'next/navigation'; // Correct import for App Router
 import { MessageSquare, Send, ArrowLeft, User, MoreVertical } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 
 export default function ChatPage({ params }: { params: Promise<{ userId: string }> }) {
     const router = useRouter(); // Use the hook
@@ -43,7 +43,7 @@ export default function ChatPage({ params }: { params: Promise<{ userId: string 
                 setMessages(msgs || []);
             } catch (error) {
                 console.error('Error loading chat:', error);
-                toast.error('Failed to load chat');
+                showError('Failed to load chat');
             } finally {
                 setLoading(false);
             }
@@ -120,7 +120,7 @@ export default function ChatPage({ params }: { params: Promise<{ userId: string 
             setMessages(prev => prev.map(m => m.id === tempId ? data : m));
         } catch (error) {
             console.error('Send error:', error);
-            toast.error('Failed to send');
+            showError('Failed to send');
             // Remove optimistic message
             setMessages(prev => prev.filter(m => m.id !== tempId));
         }
@@ -136,7 +136,7 @@ export default function ChatPage({ params }: { params: Promise<{ userId: string 
 
     return (
         <div className="min-h-screen bg-gradient-page">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role="user" currentPage="/messages" />
 
             <div className="max-w-6xl mx-auto md:px-4 md:py-8 h-[calc(100vh-80px)] flex">

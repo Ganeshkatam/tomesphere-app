@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError } from '@/lib/toast';
 import { ArrowLeft, Send, Users, Lock, MoreVertical, FileText, Video } from 'lucide-react';
 import StudentNav from '@/components/StudentNav';
 
@@ -131,7 +131,7 @@ export default function GroupChatPage() {
             if (error) throw error;
             setNewMessage('');
         } catch (error) {
-            toast.error('Failed to send message');
+            showError('Failed to send message');
         }
     };
 
@@ -207,8 +207,8 @@ export default function GroupChatPage() {
                                 )}
                                 <div
                                     className={`px-4 py-2 rounded-2xl ${isMe
-                                            ? 'bg-blue-600 text-white rounded-br-none'
-                                            : 'bg-white/10 text-white rounded-bl-none'
+                                        ? 'bg-blue-600 text-white rounded-br-none'
+                                        : 'bg-white/10 text-white rounded-bl-none'
                                         }`}
                                 >
                                     <p>{msg.message}</p>

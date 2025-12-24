@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, Book } from '@/lib/supabase';
 import { generateCitation, generateBibliography, copyToClipboard, CitationFormat } from '@/lib/citations';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { Copy, Download, BookOpen, ArrowLeft, Save } from 'lucide-react';
 
 export default function CitationsPage() {
@@ -40,13 +40,13 @@ export default function CitationsPage() {
 
     const handleSave = async () => {
         if (!bibTitle.trim()) {
-            toast.error('Please enter a title');
+            showError('Please enter a title');
             return;
         }
 
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            toast.error('Please login to save');
+            showError('Please login to save');
             router.push('/login');
             return;
         }
@@ -59,9 +59,9 @@ export default function CitationsPage() {
         });
 
         if (error) {
-            toast.error('Failed to save');
+            showError('Failed to save');
         } else {
-            toast.success('Bibliography saved!');
+            showSuccess('Bibliography saved!');
             setShowSaveModal(false);
             setBibTitle('');
         }
@@ -81,7 +81,7 @@ export default function CitationsPage() {
             if (error) throw error;
             setSearchResults(data || []);
         } catch (error: any) {
-            toast.error('Failed to search books');
+            showError('Failed to search books');
         } finally {
             setLoading(false);
         }
@@ -90,7 +90,7 @@ export default function CitationsPage() {
     const addBook = (book: Book) => {
         if (!selectedBooks.find(b => b.id === book.id)) {
             setSelectedBooks([...selectedBooks, book]);
-            toast.success('Book added to bibliography');
+            showSuccess('Book added to bibliography');
         }
     };
 
@@ -102,9 +102,9 @@ export default function CitationsPage() {
         const bibliography = generateBibliography(selectedBooks, format);
         try {
             await copyToClipboard(bibliography);
-            toast.success('Bibliography copied to clipboard!');
+            showSuccess('Bibliography copied to clipboard!');
         } catch (error) {
-            toast.error('Failed to copy');
+            showError('Failed to copy');
         }
     };
 
@@ -116,7 +116,7 @@ export default function CitationsPage() {
         a.href = url;
         a.download = `bibliography-${format}.txt`;
         a.click();
-        toast.success('Bibliography downloaded!');
+        showSuccess('Bibliography downloaded!');
     };
 
     return (

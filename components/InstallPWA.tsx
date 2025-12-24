@@ -30,7 +30,7 @@ export default function InstallPWA() {
     if (!showPopup || isInstalled) return null;
 
     return (
-        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-[100] animate-slideIn">
+        <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-8 md:w-80 z-40 animate-slideIn">
             <div className="glass-strong rounded-2xl p-6 shadow-2xl border border-white/10">
                 {/* Close Button */}
                 <button

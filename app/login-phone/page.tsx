@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 export default function PhoneLoginPage() {
     const [phone, setPhone] = useState('');
@@ -16,7 +16,7 @@ export default function PhoneLoginPage() {
         e.preventDefault();
 
         if (!phone || phone.length < 10) {
-            toast.error('Please enter a valid phone number');
+            showError('Please enter a valid phone number');
             return;
         }
 
@@ -30,11 +30,11 @@ export default function PhoneLoginPage() {
 
             if (error) throw error;
 
-            toast.success('OTP sent to your phone!');
+            showSuccess('OTP sent to your phone!');
             setStep('otp');
         } catch (error: any) {
             console.error('Error:', error);
-            toast.error(error.message || 'Failed to send OTP. Check Supabase phone auth setup.');
+            showError(error.message || 'Failed to send OTP. Check Supabase phone auth setup.');
         } finally {
             setLoading(false);
         }
@@ -44,7 +44,7 @@ export default function PhoneLoginPage() {
         e.preventDefault();
 
         if (!otp || otp.length !== 6) {
-            toast.error('Please enter the 6-digit OTP');
+            showError('Please enter the 6-digit OTP');
             return;
         }
 
@@ -60,7 +60,7 @@ export default function PhoneLoginPage() {
 
             if (error) throw error;
 
-            toast.success('Login successful!');
+            showSuccess('Login successful!');
 
             // Redirect with delay for session persistence
             setTimeout(() => {
@@ -68,7 +68,7 @@ export default function PhoneLoginPage() {
             }, 2000);
         } catch (error: any) {
             console.error('Error:', error);
-            toast.error(error.message || 'Invalid OTP');
+            showError(error.message || 'Invalid OTP');
         } finally {
             setLoading(false);
         }
@@ -76,7 +76,7 @@ export default function PhoneLoginPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page flex items-start justify-center p-4 sm:p-6 md:py-12">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
 
             <div className="w-full max-w-md">
                 {/* Header */}

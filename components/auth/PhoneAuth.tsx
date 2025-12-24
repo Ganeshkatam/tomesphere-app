@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { Phone, ArrowRight, Loader2 } from 'lucide-react';
 
 export default function PhoneAuth() {
@@ -23,9 +23,9 @@ export default function PhoneAuth() {
             if (error) throw error;
 
             setStep('otp');
-            toast.success('OTP sent to your phone!');
+            showError('Please enter a valid phone number');
         } catch (error: any) {
-            toast.error(error.message || 'Failed to send OTP');
+            showError(error.message || 'Failed to send OTP');
         } finally {
             setLoading(false);
         }
@@ -44,10 +44,10 @@ export default function PhoneAuth() {
 
             if (error) throw error;
 
-            toast.success('Logged in successfully!');
+            showSuccess('Phone verified successfully!');
             // Redirect handled by auth state listener or parent component
         } catch (error: any) {
-            toast.error(error.message || 'Invalid OTP');
+            showError(error.message || 'Invalid OTP');
         } finally {
             setLoading(false);
         }

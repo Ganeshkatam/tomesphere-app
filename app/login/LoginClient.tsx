@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { Toaster } from 'react-hot-toast';
+import { createBrowserClient } from '@supabase/ssr';
 import { showError, showSuccess } from '@/lib/toast';
 import { Lock, Mail, Smartphone, ArrowRight, Globe, ChevronDown, Sparkles } from 'lucide-react';
 
@@ -34,6 +33,11 @@ export default function EnhancedLoginPage() {
     const [showCountryDropdown, setShowCountryDropdown] = useState(false);
     const router = useRouter();
 
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
     const detectInputType = (value: string): 'email' | 'phone' | 'unknown' => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRegex = /^\d{10,15}$/;
@@ -49,12 +53,52 @@ export default function EnhancedLoginPage() {
         setIsPhone(type === 'phone');
     };
 
+    const checkUserExists = async (identifier: string, isPhoneAuth: boolean) => {
+        try {
+            const column = isPhoneAuth ? 'phone_number' : 'email';
+            const { data } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq(column, identifier)
+                .single();
+            return !!data;
+        } catch (error) {
+            return false;
+        }
+    };
+
     const handleContinue = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const type = detectInputType(input);
         if (type === 'unknown') {
             showError('Please enter a valid email or phone number');
+            return;
+        }
+
+        const fullIdentifier = isPhone ? `${countryCode}${input}` : input;
+
+        // Check if user exists
+        setLoading(true);
+        const exists = await checkUserExists(isPhone ? input : input, isPhone); // Store plain input for email, handling phone format needs care
+        // Note: Phone numbers in profiles might be stored with or without country code. 
+        // For now we check the raw input or full identifier? 
+        // Let's assume user enters strictly match. 
+        // Better yet, just check 'email' or 'phone_number'.
+
+        // Refined check:
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('id, email, phone_number')
+            .or(`email.eq.${input},phone_number.eq.${fullIdentifier},phone_number.eq.${input}`)
+            .maybeSingle();
+
+        setLoading(false);
+
+        if (!profile) {
+            showError("We couldn't find an account with those details.");
+            showSuccess("Join the TomeSphere family! Redirecting to signup...");
+            setTimeout(() => router.push('/signup'), 2000);
             return;
         }
 
@@ -72,7 +116,16 @@ export default function EnhancedLoginPage() {
         setLoading(true);
 
         try {
-            const fullIdentifier = isPhone ? `${countryCode}${input}` : input;
+            // Fix: Detect if input already has country code
+            let fullIdentifier = input;
+            if (isPhone) {
+                const cleanInput = input.replace(/[\s-]/g, '');
+                if (cleanInput.startsWith('+')) {
+                    fullIdentifier = cleanInput;
+                } else {
+                    fullIdentifier = `${countryCode}${cleanInput}`;
+                }
+            }
 
             // Check if phone (SMS OTP) or Email (Magic Link/OTP)
             if (isPhone) {
@@ -124,7 +177,16 @@ export default function EnhancedLoginPage() {
         setLoading(true);
 
         try {
-            const fullIdentifier = isPhone ? `${countryCode}${input}` : input;
+            // Fix: Detect if input already has country code for Password Login too
+            let fullIdentifier = input;
+            if (isPhone) {
+                const cleanInput = input.replace(/[\s-]/g, '');
+                if (cleanInput.startsWith('+')) {
+                    fullIdentifier = cleanInput;
+                } else {
+                    fullIdentifier = `${countryCode}${cleanInput}`;
+                }
+            }
 
             let signInResult;
 
@@ -280,7 +342,7 @@ export default function EnhancedLoginPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page flex items-center justify-center p-4">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
 
             {/* Background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">

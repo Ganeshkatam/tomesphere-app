@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
 export default function VerifyEmailPage() {
     const [loading, setLoading] = useState(false);
@@ -27,7 +27,7 @@ export default function VerifyEmailPage() {
 
         // If already verified, redirect to home
         if (user.email_confirmed_at) {
-            toast.success('Email already verified!');
+            showSuccess('Email already verified!');
             setTimeout(() => router.push('/home'), 1000);
         }
     };
@@ -42,9 +42,9 @@ export default function VerifyEmailPage() {
 
             if (error) throw error;
 
-            toast.success('Verification email sent! Check your inbox.');
+            showSuccess('Verification email resent! Check your inbox.');
         } catch (error: any) {
-            toast.error(error.message || 'Failed to resend email');
+            showError('Failed to resend email');
         } finally {
             setResending(false);
         }
@@ -57,7 +57,7 @@ export default function VerifyEmailPage() {
 
     return (
         <div className="min-h-screen bg-gradient-page flex items-start justify-center p-4 sm:p-6 md:py-12">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
 
             <div className="max-w-md w-full backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl">
                 {/* Icon */}

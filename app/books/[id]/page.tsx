@@ -4,7 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, Book, getCurrentUser } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
-import toast, { Toaster } from 'react-hot-toast';
+
 import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, BookOpen, Heart } from 'lucide-react';
 import { generateSimpleDescription } from '@/lib/pdf-description-generator';
@@ -204,7 +204,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
 
     return (
         <div className="min-h-screen bg-gradient-page">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role={user?.role || 'user'} currentPage="/books" />
 
             <div className="max-w-7xl mx-auto px-4 py-8">
@@ -237,14 +237,14 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                                 onClick={async () => {
                                     if (!confirm('Are you sure you want to delete this book? This cannot be undone.')) return;
                                     try {
-                                        toast.loading('Deleting book...');
+                                        // toast.loading('Deleting book...');
                                         const { error } = await supabase.from('books').delete().eq('id', book.id);
                                         if (error) throw error;
-                                        toast.dismiss();
-                                        toast.success('Book deleted');
+                                        // toast.dismiss();
+                                        showSuccess('Book deleted');
                                         router.push('/admin');
                                     } catch (e) {
-                                        toast.dismiss();
+                                        // toast.dismiss();
                                         showError('Failed to delete book');
                                     }
                                 }}
@@ -310,7 +310,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                                 onClick={async () => {
                                     if (book.pdf_url) {
                                         try {
-                                            toast.loading('Preparing download...');
+                                            // toast.loading('Preparing download...');
                                             const response = await fetch(book.pdf_url);
                                             const blob = await response.blob();
                                             const url = window.URL.createObjectURL(blob);
@@ -321,8 +321,8 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                                             link.click();
                                             document.body.removeChild(link);
                                             window.URL.revokeObjectURL(url);
-                                            toast.dismiss();
-                                            toast.success('Download started!');
+                                            // toast.dismiss();
+                                            showSuccess('Download started!');
                                         } catch {
                                             const link = document.createElement('a');
                                             link.href = book.pdf_url;
@@ -331,8 +331,8 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
                                             document.body.appendChild(link);
                                             link.click();
                                             document.body.removeChild(link);
-                                            toast.dismiss();
-                                            toast.success('Download started!');
+                                            // toast.dismiss();
+                                            showSuccess('Download started!');
                                         }
                                     } else {
                                         showError('Download not available');

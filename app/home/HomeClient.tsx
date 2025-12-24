@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback, use, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { GridSkeleton } from '@/components/ui/skeletons';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import Image from 'next/image';
@@ -14,7 +17,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchSuggestions from '@/components/SearchSuggestions';
 import dynamic from 'next/dynamic';
-import { toast, Toaster } from 'react-hot-toast';
 import { showError, showSuccess, showWarning } from '@/lib/toast';
 
 import { Book } from '@/lib/supabase';
@@ -416,7 +418,7 @@ export default function HomeClient() {
     return (
         <div className="min-h-screen bg-gradient-page relative w-full max-w-full mx-auto overflow-x-hidden">
             <OnboardingTour />
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role={user ? "user" : undefined} currentPage="/home" />
 
             {/* Sticky Search Bar - Appears on Scroll */}
@@ -1008,22 +1010,53 @@ export default function HomeClient() {
                         {/* Removed view toggle if complex, keeping grid */}
                     </div>
 
-                    <StaggerContainer className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                        {books.map((book) => ( // Use 'books' instead of 'filteredBooks'
-                            <StaggerItem key={book.id}>
-                                <div className="h-full transform hover:-translate-y-2 transition-transform duration-300">
-                                    <BookCard
-                                        book={book}
-                                        onLike={() => handleLike(book.id)}
-                                        onRate={(rating) => handleRate(book.id, rating)}
-                                        onAddToList={(status) => handleAddToList(book.id, status)}
-                                        isLiked={userLikes.has(book.id)}
-                                        userRating={userRatings.get(book.id) || 0}
-                                    />
-                                </div>
-                            </StaggerItem>
-                        ))}
-                    </StaggerContainer>
+                    {initialLoading ? (
+                        <GridSkeleton count={8} />
+                    ) : books.length === 0 ? (
+                        <EmptyState
+                            title="No books found"
+                            description={searchTerm
+                                ? `We couldn't find any books matching "${searchTerm}"`
+                                : "Your library is looking a bit empty. Start by adding some books!"
+                            }
+                            actionLabel={searchTerm ? "Clear search" : undefined}
+                            onAction={searchTerm ? () => setSearchTerm('') : undefined}
+                        />
+                    ) : (
+                        <motion.div
+                            initial="hidden"
+                            animate="visible"
+                            variants={{
+                                hidden: { opacity: 0 },
+                                visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+                            }}
+                            className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-4"
+                        >
+                            <AnimatePresence mode='popLayout'>
+                                {books.map((book) => (
+                                    <motion.div
+                                        key={book.id}
+                                        layout
+                                        variants={{
+                                            hidden: { opacity: 0, y: 20 },
+                                            visible: { opacity: 1, y: 0 }
+                                        }}
+                                        whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                                        className="h-full"
+                                    >
+                                        <BookCard
+                                            book={book}
+                                            onLike={() => handleLike(book.id)}
+                                            onRate={(rating) => handleRate(book.id, rating)}
+                                            onAddToList={(status) => handleAddToList(book.id, status)}
+                                            isLiked={userLikes.has(book.id)}
+                                            userRating={userRatings.get(book.id) || 0}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </motion.div>
+                    )}
 
                 </div>
             </div>

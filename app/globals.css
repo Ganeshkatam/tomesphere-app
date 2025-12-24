@@ -426,6 +426,7 @@ body::after {
   border-radius: inherit;
   padding: 1px;
   background: linear-gradient(135deg, #6366f1, #a855f7, #06b6d4);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;

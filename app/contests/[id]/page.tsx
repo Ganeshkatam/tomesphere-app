@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import { Trophy, Calendar, Users, Clock, ArrowLeft, CheckCircle } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 
-export default function ContestDetailPage({ params }: { params: { id: string } }) {
+export default async function ContestDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const router = useRouter();
     const [contest, setContest] = useState<any>(null);
     const [joined, setJoined] = useState(false);
@@ -16,7 +17,7 @@ export default function ContestDetailPage({ params }: { params: { id: string } }
 
     useEffect(() => {
         fetchContestDetails();
-    }, [params.id]);
+    }, [id]);
 
     useEffect(() => {
         if (contest) {
@@ -45,7 +46,7 @@ export default function ContestDetailPage({ params }: { params: { id: string } }
             const { data, error } = await supabase
                 .from('contests')
                 .select('*')
-                .eq('id', params.id)
+                .eq('id', id)
                 .single();
 
             if (error) throw error;
@@ -57,14 +58,14 @@ export default function ContestDetailPage({ params }: { params: { id: string } }
                 const { data: participant } = await supabase
                     .from('contest_participants')
                     .select('*')
-                    .eq('contest_id', params.id)
+                    .eq('contest_id', id)
                     .eq('user_id', user.id)
                     .single();
                 if (participant) setJoined(true);
             }
         } catch (error) {
             console.error('Error fetching contest:', error);
-            toast.error('Contest not found');
+            showError('Contest not found');
         } finally {
             setLoading(false);
         }
@@ -74,23 +75,23 @@ export default function ContestDetailPage({ params }: { params: { id: string } }
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                toast.error('Please login first');
+                showError('Please login first');
                 return;
             }
 
             const { error } = await supabase
                 .from('contest_participants')
                 .insert({
-                    contest_id: params.id,
+                    contest_id: id,
                     user_id: user.id
                 });
 
             if (error) throw error;
             setJoined(true);
-            toast.success('Successfully joined the contest!');
+            showSuccess('Successfully joined the contest!');
         } catch (error) {
             console.error('Error joining contest:', error);
-            toast.error('Failed to join contest');
+            showError('Failed to join contest');
         }
     };
 
@@ -104,7 +105,7 @@ export default function ContestDetailPage({ params }: { params: { id: string } }
 
     return (
         <div className="min-h-screen bg-gradient-page">
-            <Toaster position="top-right" />
+            {/* <Toaster position="top-right" /> */}
             <Navbar role="user" currentPage="/contests" />
 
             {/* Banner Image */}

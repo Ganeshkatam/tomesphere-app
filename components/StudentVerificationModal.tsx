@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { X, Mail, School, CheckCircle, AlertCircle, Upload, Camera, Image as ImageIcon } from 'lucide-react';
 
 interface StudentVerificationModalProps {
@@ -72,7 +72,7 @@ export default function StudentVerificationModal({ isOpen, onClose, onVerified }
                 setShowCamera(true);
             }
         } catch (error) {
-            toast.error('Camera access denied');
+            showError('Camera access denied');
         }
     };
 
@@ -99,7 +99,7 @@ export default function StudentVerificationModal({ isOpen, onClose, onVerified }
                         setIdImage(file);
                         setIdImagePreview(URL.createObjectURL(blob));
                         stopCamera();
-                        toast.success('Photo captured!');
+                        showSuccess('Photo captured!');
                     }
                 });
             }
@@ -110,16 +110,16 @@ export default function StudentVerificationModal({ isOpen, onClose, onVerified }
         const file = e.target.files?.[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
-                toast.error('File size must be less than 5MB');
+                showError('File size must be less than 5MB');
                 return;
             }
             if (!file.type.startsWith('image/')) {
-                toast.error('Please upload an image file');
+                showError('Please upload an image file');
                 return;
             }
             setIdImage(file);
             setIdImagePreview(URL.createObjectURL(file));
-            toast.success('ID uploaded!');
+            showSuccess('ID uploaded!');
         }
     };
 
@@ -148,17 +148,17 @@ export default function StudentVerificationModal({ isOpen, onClose, onVerified }
 
     const handleSubmit = async () => {
         if (!emailValidation.valid) {
-            toast.error('Please enter a valid email');
+            showError('Please enter a valid email');
             return;
         }
 
         if (!emailValidation.isStudent && (!institutionName || !studentId)) {
-            toast.error('Please provide institution name and student ID');
+            showError('Please provide institution name and student ID');
             return;
         }
 
         if (!emailValidation.isStudent && !idImage) {
-            toast.error('Please upload your student ID for verification');
+            showError('Please upload your student ID for verification');
             return;
         }
 
@@ -166,7 +166,7 @@ export default function StudentVerificationModal({ isOpen, onClose, onVerified }
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                toast.error('Please log in first');
+                showError('Please log in first');
                 return;
             }
 
@@ -189,19 +189,19 @@ export default function StudentVerificationModal({ isOpen, onClose, onVerified }
             if (error) throw error;
 
             if (emailValidation.isStudent) {
-                toast.success('Verified! You now have access to student features.');
+                showSuccess('Verified! You now have access to student features.');
                 setStep(3);
                 setTimeout(() => {
                     onVerified();
                     onClose();
                 }, 2000);
             } else {
-                toast.success('Submitted for manual verification. We\'ll review within 24 hours.');
+                showSuccess('Submitted for manual verification. We\'ll review within 24 hours.');
                 setStep(3);
                 setTimeout(() => onClose(), 3000);
             }
         } catch (error: any) {
-            toast.error('Verification failed: ' + error.message);
+            showError('Verification failed: ' + error.message);
         } finally {
             setLoading(false);
         }

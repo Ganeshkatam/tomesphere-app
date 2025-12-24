@@ -81,4 +81,5339 @@ user_memberships,"id, user_id, tier, started_at, expires_at",No Policies (Public
 user_points,"id, user_id, points, level, updated_at",No Policies (Public or Restricted),No Triggers
 user_preferences,"user_id, theme, reading_mode, email_notifications, push_notifications, language, timezone, privacy_settings, created_at, updated_at",Users can manage own preferences (ALL),No Triggers
 user_reading_stats,"user_id, name, books_finished, books_reading, books_want_to_read, total_likes, total_ratings, avg_rating_given",No Policies (Public or Restricted),No Triggers
-user_test_attempts,"id, user_id, test_id, score, answers, completed_at",Users can insert their own test attempts (INSERT) | Users can insert their own attempts (INSERT) | Users can view their own test attempts (SELECT) | Users can view their own attempts (SELECT),No Triggers
+user_test_attempts,"id, user_id, test_id, score, answers, completed_at",Users can insert their own test attempts (INSERT) | Users can insert their own attempts (INSERT) | Users can view their own test attempts (SELECT) | Users can view their own attempts (SELECT),No Triggers[
+  {
+    "type": "Trigger",
+    "parent_object": "book_club_members",
+    "item_name": "club_member_count_trigger",
+    "details": "AFTER DELETE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "book_club_members",
+    "item_name": "club_member_count_trigger",
+    "details": "AFTER INSERT"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "book_lists",
+    "item_name": "update_book_lists_updated_at",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "book_tags",
+    "item_name": "tag_usage_count_trigger",
+    "details": "AFTER DELETE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "book_tags",
+    "item_name": "tag_usage_count_trigger",
+    "details": "AFTER INSERT"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "books",
+    "item_name": "update_books_updated_at",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "collection_items",
+    "item_name": "collection_items_update_parent",
+    "details": "AFTER UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "collection_items",
+    "item_name": "collection_items_update_parent",
+    "details": "AFTER INSERT"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "comments",
+    "item_name": "update_comments_updated_at",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "group_messages",
+    "item_name": "notify-group-message",
+    "details": "AFTER INSERT"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "profiles",
+    "item_name": "update_profiles_updated_at",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "ratings",
+    "item_name": "update_ratings_updated_at",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "reading_lists",
+    "item_name": "update_reading_lists_updated_at",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "reading_notes",
+    "item_name": "update_reading_notes_updated_at",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "reviews",
+    "item_name": "update_reviews_updated_at",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "student_verifications",
+    "item_name": "update_student_verifications_modtime",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "student_verifications",
+    "item_name": "trigger_auto_verify_student",
+    "details": "BEFORE INSERT"
+  },
+  {
+    "type": "Trigger",
+    "parent_object": "user_books",
+    "item_name": "update_user_books_updated_at",
+    "details": "BEFORE UPDATE"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ab_experiments",
+    "item_name": "Admins manage experiments",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "achievements",
+    "item_name": "Achievements viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "achievements",
+    "item_name": "Only admins can manage achievements",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "activity_log",
+    "item_name": "Admins can view all activity",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "activity_log",
+    "item_name": "Users can insert own activity",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "activity_log",
+    "item_name": "Users can view own activity",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ai_recommendations",
+    "item_name": "AI recommendations private to user",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "announcements",
+    "item_name": "Everyone can view active announcements",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "announcements",
+    "item_name": "Admins can manage announcements",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "audio_progress",
+    "item_name": "Users can update own audio",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "audio_progress",
+    "item_name": "Users can see own audio",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "audio_progress",
+    "item_name": "Users can update own audio upd",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "badges",
+    "item_name": "Everyone views badges",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "book_clubs",
+    "item_name": "Creators can update clubs",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "book_clubs",
+    "item_name": "Members can view their clubs",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "book_clubs",
+    "item_name": "Users can create clubs",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "book_clubs",
+    "item_name": "Anyone can view public clubs",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "book_clubs",
+    "item_name": "Public clubs viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "book_lists",
+    "item_name": "Users can view public lists and own lists",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "book_lists",
+    "item_name": "Users can manage own lists",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "book_tags",
+    "item_name": "Book tags viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "bookmarks",
+    "item_name": "Users can view own bookmarks",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "bookmarks",
+    "item_name": "Users can insert own bookmarks",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "bookmarks",
+    "item_name": "Users can manage own bookmarks",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "bookmarks",
+    "item_name": "Users can delete own bookmarks",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "books",
+    "item_name": "Only admins can delete books",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "books",
+    "item_name": "Only admins can insert books",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "books",
+    "item_name": "Only admins can update books",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "books",
+    "item_name": "Books are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "club_members",
+    "item_name": "Users can leave clubs",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "club_members",
+    "item_name": "Anyone can view club members",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "club_members",
+    "item_name": "Users can join clubs",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "collection_items",
+    "item_name": "Users can manage own collection items",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "collection_items",
+    "item_name": "Collection items viewable if collection is",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "collections",
+    "item_name": "Users can insert own collections",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "collections",
+    "item_name": "Users can update own collections",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "collections",
+    "item_name": "Public collections viewable by all",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "collections",
+    "item_name": "Users can view own collections",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "collections",
+    "item_name": "Users can delete own collections",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "comment_likes",
+    "item_name": "Anyone can view comment likes",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "comment_likes",
+    "item_name": "Users can manage own comment likes",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "comments",
+    "item_name": "Users can update own comments",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "comments",
+    "item_name": "Users can insert own comments",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "comments",
+    "item_name": "Users can delete own comments",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "comments",
+    "item_name": "Comments are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "contest_participants",
+    "item_name": "Users can join contests",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "contest_participants",
+    "item_name": "Users can view contest participants",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "contests",
+    "item_name": "Contests are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "direct_messages",
+    "item_name": "Users can delete own messages",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "direct_messages",
+    "item_name": "Recipient can mark read",
+    "details": "Command: UPDATE | Roles: authenticated"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "direct_messages",
+    "item_name": "Users can send messages",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "direct_messages",
+    "item_name": "Users can view own messages",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_comments",
+    "item_name": "Users can update own comments",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_comments",
+    "item_name": "Users can create comments",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_comments",
+    "item_name": "Anyone can view comments",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_comments",
+    "item_name": "Users can delete own comments",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_likes",
+    "item_name": "Users can manage own likes",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_likes",
+    "item_name": "Anyone can view likes",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_replies",
+    "item_name": "Users can update own replies",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_replies",
+    "item_name": "Users can delete own replies",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_replies",
+    "item_name": "Replies viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussion_replies",
+    "item_name": "Authenticated users can create replies",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussions",
+    "item_name": "Users can update own discussions",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussions",
+    "item_name": "Users can delete own discussions",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussions",
+    "item_name": "Discussions viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "discussions",
+    "item_name": "Authenticated users can create discussions",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "flashcards",
+    "item_name": "Users can view their own flashcards",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "flashcards",
+    "item_name": "Users can update their own flashcards",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "flashcards",
+    "item_name": "Users can insert their own flashcards",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "flashcards",
+    "item_name": "Users can delete their own flashcards",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "group_files",
+    "item_name": "Members can view files",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "group_files",
+    "item_name": "Members can upload files",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "group_members",
+    "item_name": "Users can view group members",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "group_members",
+    "item_name": "Users can join groups",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "group_members",
+    "item_name": "Users can leave groups",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "group_messages",
+    "item_name": "Members can view messages",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "group_messages",
+    "item_name": "Members can post messages",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "highlights",
+    "item_name": "Users can view own highlights",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "highlights",
+    "item_name": "Users can manage own highlights",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "highlights",
+    "item_name": "Public highlights viewable by all",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "likes",
+    "item_name": "Likes are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "likes",
+    "item_name": "Users can delete own likes",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "likes",
+    "item_name": "Users can insert own likes",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "list_items",
+    "item_name": "Users can view items in accessible lists",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "list_items",
+    "item_name": "Users can manage items in own lists",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "login_history",
+    "item_name": "System can insert login history",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "login_history",
+    "item_name": "Users can view own login history",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "login_history",
+    "item_name": "Admins can view all login history",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "newsletters",
+    "item_name": "Admins can manage newsletters",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "notes",
+    "item_name": "Users can insert their own notes",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "notes",
+    "item_name": "Users can update their own notes",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "notes",
+    "item_name": "Users can delete their own notes",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "notes",
+    "item_name": "Users can view their own notes",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "notifications",
+    "item_name": "Users can delete own notifications",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "notifications",
+    "item_name": "Users can update own notifications",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "notifications",
+    "item_name": "Users can view own notifications",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "partners",
+    "item_name": "Admins manage partners",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "post_comments",
+    "item_name": "Comments are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "post_comments",
+    "item_name": "Users can manage own comments",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "post_likes",
+    "item_name": "Likes are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "post_likes",
+    "item_name": "Users can manage own likes",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "practice_tests",
+    "item_name": "Authenticated users can create practice tests",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "practice_tests",
+    "item_name": "Anyone can view practice tests",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "practice_tests",
+    "item_name": "Authenticated users can create tests",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "profiles",
+    "item_name": "Users can update own profile",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "profiles",
+    "item_name": "Enable insert for authenticated users",
+    "details": "Command: INSERT | Roles: authenticated"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "profiles",
+    "item_name": "Public profiles are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "push_notifications",
+    "item_name": "Admins manage notifications",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ratings",
+    "item_name": "Users can delete own ratings",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ratings",
+    "item_name": "Users can delete their own ratings",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ratings",
+    "item_name": "Users can insert own ratings",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ratings",
+    "item_name": "Users can insert their own ratings",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ratings",
+    "item_name": "Users can update own ratings",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ratings",
+    "item_name": "Users can update their own ratings",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ratings",
+    "item_name": "Users can view all ratings",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "ratings",
+    "item_name": "Ratings are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_activity",
+    "item_name": "Users can insert own activity",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_activity",
+    "item_name": "Users can view own activity",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_goals",
+    "item_name": "Users can manage own goals",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_lists",
+    "item_name": "Users can delete own reading lists",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_lists",
+    "item_name": "Users can view own reading lists",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_lists",
+    "item_name": "Users can update own reading lists",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_lists",
+    "item_name": "Users can insert own reading lists",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_notes",
+    "item_name": "Users can manage own notes",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_notes",
+    "item_name": "Users can view own notes",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_progress",
+    "item_name": "Users can view own progress",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_progress",
+    "item_name": "Users can view own reading progress",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_progress",
+    "item_name": "Users can update own reading progress",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_progress",
+    "item_name": "Users can update own progress upd",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_progress",
+    "item_name": "Users can update own progress",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_progress",
+    "item_name": "Users can see own progress",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_progress",
+    "item_name": "Users can manage own progress",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_progress",
+    "item_name": "Users can insert own reading progress",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_sessions",
+    "item_name": "Admins can view all reading sessions",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_sessions",
+    "item_name": "Users can insert their own reading sessions",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_sessions",
+    "item_name": "Users can view their own reading sessions",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reading_sessions",
+    "item_name": "Users can update their own reading sessions",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reviews",
+    "item_name": "Admins can update any review",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reviews",
+    "item_name": "Users can insert own reviews",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reviews",
+    "item_name": "Users can update own reviews",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reviews",
+    "item_name": "Users can delete own reviews",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "reviews",
+    "item_name": "Reviews are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "saved_listings",
+    "item_name": "Users can save listings",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "saved_listings",
+    "item_name": "Users can unsave listings",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "saved_listings",
+    "item_name": "Users can view their saved listings",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "site_config",
+    "item_name": "Admins can update site config",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "site_config",
+    "item_name": "Everyone can view site config",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "social_posts",
+    "item_name": "Users can manage own posts",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "social_posts",
+    "item_name": "Posts are viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "student_profiles",
+    "item_name": "Users can update their own student profile",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "student_profiles",
+    "item_name": "Users can insert their own student profile",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "student_profiles",
+    "item_name": "Users can view their own student profile",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "student_verification_tokens",
+    "item_name": "Users can view their own tokens",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "student_verifications",
+    "item_name": "Users can insert their own verifications",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "student_verifications",
+    "item_name": "Users can view their own verifications",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "student_verifications",
+    "item_name": "Admins can update verifications",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "student_verifications",
+    "item_name": "Admins can view all verifications",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "study_groups",
+    "item_name": "Anyone can view public groups",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "study_groups",
+    "item_name": "Creators can update their groups",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "study_groups",
+    "item_name": "Authenticated users can create groups",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "subscriptions",
+    "item_name": "Can view own subscription data.",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "tags",
+    "item_name": "Tags viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "test_questions",
+    "item_name": "Anyone can view test questions",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "textbook_listings",
+    "item_name": "Anyone can view available listings",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "textbook_listings",
+    "item_name": "Users can create their listings",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "textbook_listings",
+    "item_name": "Sellers can update their listings",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "textbook_listings",
+    "item_name": "Sellers can delete their listings",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "textbook_offers",
+    "item_name": "Users can view relevant offers",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "textbook_offers",
+    "item_name": "Buyers can make offers",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "transactions",
+    "item_name": "Admins view transactions",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_achievements",
+    "item_name": "Achievements are public",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_achievements",
+    "item_name": "Everyone can view user achievements",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_achievements",
+    "item_name": "Users can view own achievements",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_activity_log",
+    "item_name": "Admins can view all activity",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_activity_log",
+    "item_name": "Users can view own activity",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_activity_log",
+    "item_name": "System can insert activity",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_badges",
+    "item_name": "Users view own badges",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_bans",
+    "item_name": "Users can view own bans",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_bans",
+    "item_name": "Admins can manage bans",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_books",
+    "item_name": "Users can manage own books",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_follows",
+    "item_name": "Follows viewable by everyone",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_follows",
+    "item_name": "Anyone can view follows",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_follows",
+    "item_name": "Users can follow others",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_follows",
+    "item_name": "Users can manage own follows",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_follows",
+    "item_name": "Users can unfollow",
+    "details": "Command: DELETE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_lists",
+    "item_name": "Users can view own list",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_lists",
+    "item_name": "Users can manage own list",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_points",
+    "item_name": "Users can update own points",
+    "details": "Command: UPDATE | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_points",
+    "item_name": "Points are public",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_preferences",
+    "item_name": "Users can manage own preferences",
+    "details": "Command: ALL | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_test_attempts",
+    "item_name": "Users can insert their own test attempts",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_test_attempts",
+    "item_name": "Users can view their own test attempts",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_test_attempts",
+    "item_name": "Users can insert their own attempts",
+    "details": "Command: INSERT | Roles: public"
+  },
+  {
+    "type": "RLS Policy",
+    "parent_object": "user_test_attempts",
+    "item_name": "Users can view their own attempts",
+    "details": "Command: SELECT | Roles: public"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "log_user_activity",
+    "details": "Returns: uuid"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "auto_verify_student_email",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "update_club_member_count",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "increment_book_view",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "update_tag_usage_count",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "auto_match_cover_to_book",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "update_modified_column",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "update_collection_updated_at",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "update_updated_at_column",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "toggle_maintenance_mode",
+    "details": "Returns: jsonb"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "get_active_announcements",
+    "details": "Returns: record"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "update_engagement_score",
+    "details": "Returns: integer"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "update_tag_usage_count",
+    "details": "Returns: void"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "format_file_size",
+    "details": "Returns: text"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "handle_new_user",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Function",
+    "parent_object": "Schema: public",
+    "item_name": "auto_create_book_from_upload",
+    "details": "Returns: trigger"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ab_experiments",
+    "item_name": "variant_b",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ab_experiments",
+    "item_name": "variant_a",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ab_experiments",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ab_experiments",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ab_experiments",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ab_experiments",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "achievements",
+    "item_name": "condition_type",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "achievements",
+    "item_name": "points",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "achievements",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "achievements",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "achievements",
+    "item_name": "condition_value",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "achievements",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "achievements",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "achievements",
+    "item_name": "badge_icon",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "activity_log",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "activity_log",
+    "item_name": "action_type",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "activity_log",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "activity_log",
+    "item_name": "metadata",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "activity_log",
+    "item_name": "book_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "activity_log",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ai_recommendations",
+    "item_name": "algorithm",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ai_recommendations",
+    "item_name": "reason",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ai_recommendations",
+    "item_name": "interacted_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ai_recommendations",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ai_recommendations",
+    "item_name": "was_accepted",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ai_recommendations",
+    "item_name": "confidence_score",
+    "details": "numeric (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ai_recommendations",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ai_recommendations",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ai_recommendations",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "starts_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "ends_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "created_by",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "target_audience",
+    "details": "ARRAY (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "title",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "type",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "announcements",
+    "item_name": "is_active",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "audio_progress",
+    "item_name": "current_position_seconds",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "audio_progress",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "audio_progress",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "audio_progress",
+    "item_name": "last_played_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "audio_progress",
+    "item_name": "audiobook_id",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "author_qa_sessions",
+    "item_name": "title",
+    "details": "character varying (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "author_qa_sessions",
+    "item_name": "scheduled_at",
+    "details": "timestamp without time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "author_qa_sessions",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "author_qa_sessions",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "author_qa_sessions",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "author_qa_sessions",
+    "item_name": "author_name",
+    "details": "character varying (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "badges",
+    "item_name": "icon_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "badges",
+    "item_name": "criteria",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "badges",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "badges",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "badges",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "badges",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_books",
+    "item_name": "added_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_books",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_books",
+    "item_name": "club_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_books",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_books",
+    "item_name": "start_date",
+    "details": "date (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_books",
+    "item_name": "end_date",
+    "details": "date (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_books",
+    "item_name": "is_current",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_members",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_members",
+    "item_name": "joined_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_members",
+    "item_name": "club_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_club_members",
+    "item_name": "role",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "creator_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "cover_image",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "is_private",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "member_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "is_public",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_clubs",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_lists",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_lists",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_lists",
+    "item_name": "name",
+    "details": "character varying (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_lists",
+    "item_name": "updated_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_lists",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_lists",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_lists",
+    "item_name": "is_public",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_quotes",
+    "item_name": "is_public",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_quotes",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_quotes",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_quotes",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_quotes",
+    "item_name": "quote_text",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_quotes",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_quotes",
+    "item_name": "page_number",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_series",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_series",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_series",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_series",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_series",
+    "item_name": "total_books",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_tags",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_tags",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "book_tags",
+    "item_name": "tag_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "bookmarks",
+    "item_name": "page_number",
+    "details": "integer (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "bookmarks",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "bookmarks",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "bookmarks",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "bookmarks",
+    "item_name": "label",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "bookmarks",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "academic_subject",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "is_textbook",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "series_order",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "file_size",
+    "details": "bigint (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "series_position",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "series_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "pdf_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "author",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "genre",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "cover_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "isbn",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "publisher",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "series",
+    "details": "character varying (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "download_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "file_size_mb",
+    "details": "numeric (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "format",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "total_pages",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "edition",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "view_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "pages",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "epub_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "is_featured",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "language",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "title",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "books",
+    "item_name": "release_date",
+    "details": "date (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "challenge_participants",
+    "item_name": "joined_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "challenge_participants",
+    "item_name": "challenge_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "challenge_participants",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "challenge_participants",
+    "item_name": "books_completed",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "challenge_participants",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "club_members",
+    "item_name": "joined_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "club_members",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "club_members",
+    "item_name": "club_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "club_members",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "club_members",
+    "item_name": "role",
+    "details": "character varying (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collection_items",
+    "item_name": "added_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collection_items",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collection_items",
+    "item_name": "collection_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collection_items",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collection_items",
+    "item_name": "position",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collections",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collections",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collections",
+    "item_name": "is_public",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collections",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collections",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collections",
+    "item_name": "cover_image",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collections",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "collections",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comment_likes",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comment_likes",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comment_likes",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comment_likes",
+    "item_name": "comment_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comments",
+    "item_name": "parent_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comments",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comments",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comments",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comments",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comments",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "comments",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contest_participants",
+    "item_name": "joined_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contest_participants",
+    "item_name": "contest_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contest_participants",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contest_participants",
+    "item_name": "score",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contest_participants",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contests",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contests",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contests",
+    "item_name": "image_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contests",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contests",
+    "item_name": "prize_xp",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contests",
+    "item_name": "end_date",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contests",
+    "item_name": "title",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contests",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "contests",
+    "item_name": "start_date",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "direct_messages",
+    "item_name": "receiver_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "direct_messages",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "direct_messages",
+    "item_name": "sender_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "direct_messages",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "direct_messages",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "direct_messages",
+    "item_name": "is_read",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_comments",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_comments",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_comments",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_comments",
+    "item_name": "parent_comment_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_comments",
+    "item_name": "discussion_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_comments",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_comments",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_likes",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_likes",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_likes",
+    "item_name": "discussion_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_likes",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_replies",
+    "item_name": "discussion_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_replies",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_replies",
+    "item_name": "parent_reply_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_replies",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_replies",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_replies",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussion_replies",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussions",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussions",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussions",
+    "item_name": "is_pinned",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussions",
+    "item_name": "view_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussions",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussions",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussions",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussions",
+    "item_name": "title",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "discussions",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "event_registrations",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "event_registrations",
+    "item_name": "event_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "event_registrations",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "event_registrations",
+    "item_name": "registered_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "flashcards",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "flashcards",
+    "item_name": "book_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "flashcards",
+    "item_name": "front_text",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "flashcards",
+    "item_name": "subject",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "flashcards",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "flashcards",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "flashcards",
+    "item_name": "back_text",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_categories",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_categories",
+    "item_name": "name",
+    "details": "character varying (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_categories",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_categories",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_replies",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_replies",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_replies",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_replies",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_replies",
+    "item_name": "thread_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_threads",
+    "item_name": "is_pinned",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_threads",
+    "item_name": "is_locked",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_threads",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_threads",
+    "item_name": "category_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_threads",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_threads",
+    "item_name": "title",
+    "details": "character varying (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_threads",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "forum_threads",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_files",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_files",
+    "item_name": "file_type",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_files",
+    "item_name": "file_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_files",
+    "item_name": "group_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_files",
+    "item_name": "uploaded_by",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_files",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_files",
+    "item_name": "file_name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_members",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_members",
+    "item_name": "joined_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_members",
+    "item_name": "role",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_members",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_members",
+    "item_name": "group_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_messages",
+    "item_name": "group_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_messages",
+    "item_name": "message",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_messages",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_messages",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "group_messages",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "is_public",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "page_number",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "text",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "color",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "highlights",
+    "item_name": "note",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "likes",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "likes",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "likes",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "likes",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "list_items",
+    "item_name": "added_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "list_items",
+    "item_name": "book_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "list_items",
+    "item_name": "list_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "list_items",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "live_events",
+    "item_name": "event_type",
+    "details": "character varying (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "live_events",
+    "item_name": "scheduled_at",
+    "details": "timestamp without time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "live_events",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "live_events",
+    "item_name": "duration_minutes",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "live_events",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "live_events",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "live_events",
+    "item_name": "title",
+    "details": "character varying (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "login_history",
+    "item_name": "ip_address",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "login_history",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "login_history",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "login_history",
+    "item_name": "user_agent",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "login_history",
+    "item_name": "failure_reason",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "login_history",
+    "item_name": "success",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "login_history",
+    "item_name": "login_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "subject",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "body",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "sent_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "html_body",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "recipients_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "open_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "created_by",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "click_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "segment",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "newsletters",
+    "item_name": "scheduled_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notes",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notes",
+    "item_name": "title",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notes",
+    "item_name": "content",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notes",
+    "item_name": "tags",
+    "details": "ARRAY (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notes",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notes",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notes",
+    "item_name": "book_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notes",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notifications",
+    "item_name": "is_read",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notifications",
+    "item_name": "type",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notifications",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notifications",
+    "item_name": "link",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notifications",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notifications",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "notifications",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "partners",
+    "item_name": "type",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "partners",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "partners",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "partners",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "partners",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "partners",
+    "item_name": "contact_email",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "release_date",
+    "details": "date (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "series_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "view_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "publisher",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "language",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "download_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "file_size_mb",
+    "details": "numeric (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "genre",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "is_featured",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "format",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "epub_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "pages",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "title",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "author",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "pdf_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "cover_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "avg_rating",
+    "details": "numeric (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "isbn",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "review_count",
+    "details": "bigint (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "like_count",
+    "details": "bigint (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "popular_books",
+    "item_name": "series_position",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "post_comments",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "post_comments",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "post_comments",
+    "item_name": "post_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "post_comments",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "post_comments",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "post_likes",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "post_likes",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "post_likes",
+    "item_name": "post_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "post_likes",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "practice_tests",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "practice_tests",
+    "item_name": "created_by",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "practice_tests",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "practice_tests",
+    "item_name": "time_limit_minutes",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "practice_tests",
+    "item_name": "subject",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "practice_tests",
+    "item_name": "difficulty",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "practice_tests",
+    "item_name": "title",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "twitter_handle",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "stripe_customer_id",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "phone_number",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "login_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "last_login_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "engagement_score",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "profile_completed",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "reading_goal",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "last_activity_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "reading_streak_days",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "total_points",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "is_verified",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "reading_goal_yearly",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "email",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "role",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "avatar_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "bio",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "location",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "website",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "favorite_genre",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "profiles",
+    "item_name": "favorite_genres",
+    "details": "ARRAY (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "push_notifications",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "push_notifications",
+    "item_name": "body",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "push_notifications",
+    "item_name": "title",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "push_notifications",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "push_notifications",
+    "item_name": "sent_to",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "push_notifications",
+    "item_name": "sent_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "qa_questions",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "qa_questions",
+    "item_name": "question",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "qa_questions",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "qa_questions",
+    "item_name": "session_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "qa_questions",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "qa_questions",
+    "item_name": "upvotes",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "qa_questions",
+    "item_name": "is_answered",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ratings",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ratings",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ratings",
+    "item_name": "rating",
+    "details": "integer (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ratings",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ratings",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "ratings",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_activity",
+    "item_name": "date",
+    "details": "date (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_activity",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_activity",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_activity",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_challenges",
+    "item_name": "start_date",
+    "details": "date (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_challenges",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_challenges",
+    "item_name": "name",
+    "details": "character varying (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_challenges",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_challenges",
+    "item_name": "goal_books",
+    "details": "integer (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_challenges",
+    "item_name": "end_date",
+    "details": "date (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_challenges",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "goal_type",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "current_value",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "year",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "start_date",
+    "details": "date (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "end_date",
+    "details": "date (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "is_active",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_goals",
+    "item_name": "target_value",
+    "details": "integer (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_lists",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_lists",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_lists",
+    "item_name": "status",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_lists",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_lists",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_lists",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_notes",
+    "item_name": "note",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_notes",
+    "item_name": "book_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_notes",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_notes",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_notes",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_notes",
+    "item_name": "is_private",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_notes",
+    "item_name": "chapter",
+    "details": "character varying (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_notes",
+    "item_name": "page_number",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_notes",
+    "item_name": "updated_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "started_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "percentage",
+    "details": "numeric (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "last_read_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "reading_time_minutes",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "current_page",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "total_pages",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_progress",
+    "item_name": "finished_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_sessions",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_sessions",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_sessions",
+    "item_name": "ended_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_sessions",
+    "item_name": "started_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_sessions",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_sessions",
+    "item_name": "duration_seconds",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reading_sessions",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reviews",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reviews",
+    "item_name": "flagged",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reviews",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reviews",
+    "item_name": "flagged_reason",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reviews",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reviews",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reviews",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "reviews",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "saved_listings",
+    "item_name": "listing_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "saved_listings",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "saved_listings",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "saved_listings",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "site_config",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "site_config",
+    "item_name": "value",
+    "details": "jsonb (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "site_config",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "site_config",
+    "item_name": "key",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "site_config",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "site_config",
+    "item_name": "updated_by",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "social_posts",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "social_posts",
+    "item_name": "book_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "social_posts",
+    "item_name": "content",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "social_posts",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "social_posts",
+    "item_name": "post_type",
+    "details": "character varying (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "social_posts",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "id_image_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "discount_eligible",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "verification_status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "verified_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "graduation_year",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "major",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "student_id",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "institution_name",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "email",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "verification_method",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_profiles",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verification_tokens",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verification_tokens",
+    "item_name": "edu_email",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verification_tokens",
+    "item_name": "token",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verification_tokens",
+    "item_name": "used",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verification_tokens",
+    "item_name": "expires_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verification_tokens",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verification_tokens",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "full_name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "verification_type",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "admin_notes",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "document_url",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "university_name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "student_verifications",
+    "item_name": "student_email",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "study_groups",
+    "item_name": "meeting_link",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "study_groups",
+    "item_name": "created_by",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "study_groups",
+    "item_name": "max_members",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "study_groups",
+    "item_name": "subject",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "study_groups",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "study_groups",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "study_groups",
+    "item_name": "is_private",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "study_groups",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "study_groups",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "trial_end",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "trial_start",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "canceled_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "cancel_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "ended_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "current_period_end",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "current_period_start",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "cancel_at_period_end",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "quantity",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "subscriptions",
+    "item_name": "price_id",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "tags",
+    "item_name": "name",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "tags",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "tags",
+    "item_name": "slug",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "tags",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "tags",
+    "item_name": "usage_count",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "test_questions",
+    "item_name": "points",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "test_questions",
+    "item_name": "order_index",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "test_questions",
+    "item_name": "explanation",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "test_questions",
+    "item_name": "question_text",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "test_questions",
+    "item_name": "question_type",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "test_questions",
+    "item_name": "correct_answer",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "test_questions",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "test_questions",
+    "item_name": "test_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "test_questions",
+    "item_name": "options",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "title",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "condition",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "price",
+    "details": "numeric (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "author",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "book_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "seller_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "isbn",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "description",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "images",
+    "details": "ARRAY (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_listings",
+    "item_name": "edition",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_offers",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_offers",
+    "item_name": "message",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_offers",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_offers",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_offers",
+    "item_name": "offered_price",
+    "details": "numeric (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_offers",
+    "item_name": "buyer_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "textbook_offers",
+    "item_name": "listing_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "transactions",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "transactions",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "transactions",
+    "item_name": "amount",
+    "details": "numeric (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "transactions",
+    "item_name": "type",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "transactions",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "transactions",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_achievements",
+    "item_name": "achievement_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_achievements",
+    "item_name": "earned_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_achievements",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_activity_log",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_activity_log",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_activity_log",
+    "item_name": "user_agent",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_activity_log",
+    "item_name": "ip_address",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_activity_log",
+    "item_name": "action_type",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_activity_log",
+    "item_name": "action_data",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_activity_log",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_badges",
+    "item_name": "earned_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_badges",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_badges",
+    "item_name": "badge_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_bans",
+    "item_name": "notes",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_bans",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_bans",
+    "item_name": "is_active",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_bans",
+    "item_name": "expires_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_bans",
+    "item_name": "reason",
+    "details": "text (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_bans",
+    "item_name": "banned_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_bans",
+    "item_name": "banned_by",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_bans",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "book_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "created_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "updated_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "review",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "status",
+    "details": "character varying (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "finished_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "started_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "rating",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_books",
+    "item_name": "current_page",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_follows",
+    "item_name": "following_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_follows",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_follows",
+    "item_name": "follower_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_lists",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_lists",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_lists",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_lists",
+    "item_name": "status",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_lists",
+    "item_name": "progress",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_lists",
+    "item_name": "book_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_lists",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_memberships",
+    "item_name": "expires_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_memberships",
+    "item_name": "tier",
+    "details": "character varying (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_memberships",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_memberships",
+    "item_name": "started_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_memberships",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_points",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_points",
+    "item_name": "level",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_points",
+    "item_name": "updated_at",
+    "details": "timestamp without time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_points",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_points",
+    "item_name": "points",
+    "details": "integer (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "updated_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "timezone",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "language",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "user_id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "reading_mode",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "email_notifications",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "theme",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "push_notifications",
+    "details": "boolean (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "privacy_settings",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_preferences",
+    "item_name": "created_at",
+    "details": "timestamp with time zone (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_reading_stats",
+    "item_name": "total_likes",
+    "details": "bigint (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_reading_stats",
+    "item_name": "books_finished",
+    "details": "bigint (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_reading_stats",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_reading_stats",
+    "item_name": "books_want_to_read",
+    "details": "bigint (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_reading_stats",
+    "item_name": "avg_rating_given",
+    "details": "numeric (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_reading_stats",
+    "item_name": "name",
+    "details": "text (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_reading_stats",
+    "item_name": "books_reading",
+    "details": "bigint (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_reading_stats",
+    "item_name": "total_ratings",
+    "details": "bigint (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_test_attempts",
+    "item_name": "score",
+    "details": "numeric (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_test_attempts",
+    "item_name": "user_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_test_attempts",
+    "item_name": "test_id",
+    "details": "uuid (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_test_attempts",
+    "item_name": "answers",
+    "details": "jsonb (Nullable)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_test_attempts",
+    "item_name": "id",
+    "details": "uuid (Required)"
+  },
+  {
+    "type": "Column",
+    "parent_object": "user_test_attempts",
+    "item_name": "completed_at",
+    "details": "timestamp with time zone (Nullable)"
+  }
+]

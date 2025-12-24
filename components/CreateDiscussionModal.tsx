@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { X } from 'lucide-react';
 
 interface CreateDiscussionModalProps {
@@ -18,7 +18,7 @@ export default function CreateDiscussionModal({ user, onClose, onSuccess }: Crea
         e.preventDefault();
 
         if (!title.trim() || !content.trim()) {
-            toast.error('Please fill all fields');
+            showError('Please fill in all required fields');
             return;
         }
 
@@ -34,12 +34,12 @@ export default function CreateDiscussionModal({ user, onClose, onSuccess }: Crea
 
             if (error) throw error;
 
-            toast.success('Discussion created!');
+            showSuccess('Discussion created!');
             onSuccess();
             onClose();
         } catch (error: any) {
             console.error('Error creating discussion:', error);
-            toast.error(error.message || 'Failed to create discussion');
+            showError('Failed to create discussion');
         } finally {
             setLoading(false);
         }

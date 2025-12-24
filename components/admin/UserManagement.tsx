@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase, Profile } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import VoiceInput from '@/components/ui/VoiceInput';
 
 export default function UserManagement() {
@@ -25,7 +25,7 @@ export default function UserManagement() {
             setUsers(data || []);
             setLoading(false);
         } catch (error) {
-            toast.error('Failed to load users');
+            showError('Failed to load users');
             setLoading(false);
         }
     };
@@ -48,9 +48,9 @@ export default function UserManagement() {
             setUsers(prev =>
                 prev.map(u => (u.id === userId ? { ...u, role: newRole as 'user' | 'admin' } : u))
             );
-            toast.success(`Role updated to ${newRole}`);
+            showSuccess(`Role updated to ${newRole}`);
         } catch (error) {
-            toast.error('Failed to update role');
+            showError('Failed to update role');
         }
     };
 
@@ -70,7 +70,7 @@ export default function UserManagement() {
 
     const handleCreateUser = async (e: React.FormEvent) => {
         e.preventDefault();
-        const loadingToast = toast.loading('Creating user...');
+        // const loadingToast = toast.loading('Creating user...');
 
         try {
             const response = await fetch('/api/admin/create-user', {
@@ -85,14 +85,14 @@ export default function UserManagement() {
                 throw new Error(result.error);
             }
 
-            toast.dismiss(loadingToast);
-            toast.success('User created successfully!');
+            // toast.dismiss(loadingToast);
+            showSuccess('User created successfully!');
             setShowCreateModal(false);
             setFormData({ email: '', password: '', name: '', role: 'user' });
             fetchUsers(); // Refresh list
         } catch (error: any) {
-            toast.dismiss(loadingToast);
-            toast.error(error.message || 'Failed to create user');
+            // toast.dismiss(loadingToast);
+            showError(error.message || 'Failed to create user');
         }
     };
 

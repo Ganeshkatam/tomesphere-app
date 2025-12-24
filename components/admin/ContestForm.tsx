@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { X, Upload, Calendar, Trophy, Image as ImageIcon } from 'lucide-react';
 import VoiceInput from '@/components/ui/VoiceInput';
 
@@ -61,20 +61,20 @@ export default function ContestForm({ contest, onClose, onSuccess }: ContestForm
                     .update(dataToSave)
                     .eq('id', contest.id);
                 if (error) throw error;
-                toast.success('Contest updated successfully');
+                showSuccess('Contest updated successfully');
             } else {
                 // Create
                 const { error } = await supabase
                     .from('contests')
                     .insert(dataToSave);
                 if (error) throw error;
-                toast.success('Contest created successfully');
+                showSuccess('Contest created successfully');
             }
 
             onSuccess();
         } catch (error) {
             console.error('Error saving contest:', error);
-            toast.error('Failed to save contest');
+            showError('Failed to save contest');
         } finally {
             setLoading(false);
         }

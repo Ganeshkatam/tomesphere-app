@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '@/lib/toast';
 import { ArrowLeft, Plus, Trash2, RotateCcw } from 'lucide-react';
 
 interface Flashcard {
@@ -44,7 +44,7 @@ export default function FlashcardsPage() {
             if (error) throw error;
             setFlashcards(data || []);
         } catch (error: any) {
-            toast.error('Failed to load flashcards');
+            showError('Failed to load flashcards');
         } finally {
             setLoading(false);
         }
@@ -52,7 +52,7 @@ export default function FlashcardsPage() {
 
     const handleCreate = async () => {
         if (!newCard.front || !newCard.back) {
-            toast.error('Please fill in both sides of the card');
+            showError('Please fill in both sides of the card');
             return;
         }
 
@@ -69,12 +69,12 @@ export default function FlashcardsPage() {
 
             if (error) throw error;
 
-            toast.success('Flashcard created!');
+            showSuccess('Flashcard created!');
             setNewCard({ front: '', back: '', subject: '' });
             setShowCreateModal(false);
             fetchFlashcards();
         } catch (error: any) {
-            toast.error('Failed to create flashcard');
+            showError('Failed to create flashcard');
         }
     };
 
@@ -82,10 +82,10 @@ export default function FlashcardsPage() {
         try {
             const { error } = await supabase.from('flashcards').delete().eq('id', id);
             if (error) throw error;
-            toast.success('Flashcard deleted');
+            showSuccess('Flashcard deleted');
             fetchFlashcards();
         } catch (error: any) {
-            toast.error('Failed to delete flashcard');
+            showError('Failed to delete flashcard');
         }
     };
 

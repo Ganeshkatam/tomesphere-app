@@ -1,5 +1,8 @@
 'use client';
 
+import { motion, AnimatePresence } from 'framer-motion';
+import { GridSkeleton } from '@/components/ui/skeletons';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -50,6 +53,62 @@ export default function LandingClient() {
   const [searchOrigin, setSearchOrigin] = useState<'book' | 'genre' | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
+
+  // Dynamic Book Fetching (Server-Side)
+  // Dynamic Book Fetching (Server-Side)
+  const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Client-side search logic
+  const filterBooks = (search: string, genreFilters: string[]) => {
+    const isClearing = !search && genreFilters.length === 0;
+
+    let results = [...allBooks];
+
+    if (search.trim()) {
+      const terms = search.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+      results = results.filter(book => {
+        const title = (book.title || '').toLowerCase();
+        const author = (book.author || '').toLowerCase();
+        const desc = (book.description || '').toLowerCase();
+
+        // Every search term must be found in at least one of the fields
+        return terms.every(term =>
+          title.includes(term) || author.includes(term) || desc.includes(term)
+        );
+      });
+    }
+
+    if (genreFilters.length > 0) {
+      results = results.filter(book => {
+        if (!book.genre) return false;
+        const bookGenre = book.genre.toLowerCase();
+        // Check if ANY of the selected genres are contained in the book's genre string
+        // This handles "Science Fiction" matching "Fiction" or "Sci-Fi" matching "Sci-Fi"
+        return genreFilters.some(filter => bookGenre.includes(filter.toLowerCase()));
+      });
+    }
+
+    // Shuffle if clearing, otherwise sort by relevance/date
+    if (isClearing && results.length > 0) {
+      results = results.sort(() => Math.random() - 0.5);
+    } else {
+      // Default sort: newest first
+      results = results.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+
+    setFilteredBooks(results);
+  };
+
+  // NOTE: We keep this function signature to match the call sites, 
+  // but it now uses the client-side data instead of making a new request.
+  const fetchBooks = async (search: string, genreFilters: string[]) => {
+    // If allBooks is empty, we might need to fetch them first or wait.
+    // But usually fetchData() populates it.
+    // We'll call filterBooks directly.
+    filterBooks(search, genreFilters);
+  };
 
   useEffect(() => {
     fetchData();
@@ -123,8 +182,22 @@ export default function LandingClient() {
         .order('created_at', { ascending: false });
 
       if (popularBooksError) throw popularBooksError;
+      if (popularBooksError) throw popularBooksError;
       if (books) {
         setPopularBooks(books);
+      }
+
+      // Fetch ALL books for client-side search
+      const { data: allBooksData, error: allBooksError } = await supabase
+        .from('books')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (allBooksError) throw allBooksError;
+      if (allBooksData) {
+        setAllBooks(allBooksData);
+        setFilteredBooks(allBooksData); // Initial display
+        setLoading(false);
       }
 
       // Fetch stats
@@ -145,29 +218,7 @@ export default function LandingClient() {
     }
   };
 
-  // Dynamic Book Fetching (Server-Side)
-  const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
 
-  const fetchBooks = async (search: string, genreFilters: string[]) => {
-    const isClearing = !search && genreFilters.length === 0;
-    if (!isClearing) setIsSearching(true);
-
-    try {
-      let query = supabase.from('books').select('*').order('created_at', { ascending: false });
-      if (search.trim()) query = query.or(`title.ilike.%${search}%,author.ilike.%${search}%,description.ilike.%${search}%`);
-      if (genreFilters.length > 0) query = query.in('genre', genreFilters);
-
-      const { data, error } = await query;
-      if (error) throw error;
-      setFilteredBooks(data || []);
-    } catch (error: any) {
-      console.error('Error fetching books:', error);
-      showError('Failed to search books');
-    } finally {
-      setIsSearching(false);
-    }
-  };
 
   const handleSearch = () => {
     // If there's a search query or genres, scroll to results and fetch
@@ -228,7 +279,11 @@ export default function LandingClient() {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSearchQuery(val);
+                    fetchBooks(val, selectedGenres);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       handleSearch();
@@ -245,7 +300,7 @@ export default function LandingClient() {
                     <button
                       onClick={() => {
                         setSearchQuery('');
-                        // fetchBooks('', selectedGenres); // No need to fetch books on clear if we are redirecting
+                        fetchBooks('', selectedGenres); // Trigger random fetch on clear
                       }}
                       className="text-slate-400 hover:text-white text-sm p-1 hover:bg-white/10 rounded-full transition-colors"
                     >
@@ -283,7 +338,9 @@ export default function LandingClient() {
                   onChange={(e) => {
                     const genre = e.target.value;
                     if (genre && !selectedGenres.includes(genre)) {
-                      setSelectedGenres([...selectedGenres, genre]);
+                      const newGenres = [...selectedGenres, genre];
+                      setSelectedGenres(newGenres);
+                      fetchBooks(searchQuery, newGenres);
                     }
                   }}
                   className="px-4 py-2 pr-8 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-white/10 transition-all appearance-none cursor-pointer min-w-[160px]"
@@ -348,7 +405,11 @@ export default function LandingClient() {
                   {selectedGenres.map(g => (
                     <button
                       key={g}
-                      onClick={() => setSelectedGenres(selectedGenres.filter(genre => genre !== g))}
+                      onClick={() => {
+                        const newGenres = selectedGenres.filter(genre => genre !== g);
+                        setSelectedGenres(newGenres);
+                        fetchBooks(searchQuery, newGenres);
+                      }}
                       className="px-2 py-1 rounded-full bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600/40 transition-colors flex items-center gap-1"
                     >
                       {g}
@@ -356,7 +417,10 @@ export default function LandingClient() {
                     </button>
                   ))}
                   <button
-                    onClick={() => setSelectedGenres([])}
+                    onClick={() => {
+                      setSelectedGenres([]);
+                      fetchBooks(searchQuery, []);
+                    }}
                     className="px-2 py-1 text-slate-400 hover:text-white transition-colors"
                   >
                     Clear all
@@ -559,7 +623,11 @@ export default function LandingClient() {
                     <input
                       type="text"
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setSearchQuery(val);
+                        fetchBooks(val, selectedGenres);
+                      }}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') handleSearch();
                       }}
@@ -645,11 +713,14 @@ export default function LandingClient() {
                                   <button
                                     key={genre}
                                     onClick={() => {
+                                      let newGenres;
                                       if (isSelected) {
-                                        setSelectedGenres(selectedGenres.filter(g => g !== genre));
+                                        newGenres = selectedGenres.filter(g => g !== genre);
                                       } else {
-                                        setSelectedGenres([...selectedGenres, genre]);
+                                        newGenres = [...selectedGenres, genre];
                                       }
+                                      setSelectedGenres(newGenres);
+                                      fetchBooks(searchQuery, newGenres);
                                     }}
                                     className={`w-full text-left px-3 py-2 rounded-lg transition-all flex items-center justify-between ${isSelected
                                       ? 'bg-indigo-600/30 text-white border border-indigo-500/50'
@@ -719,11 +790,14 @@ export default function LandingClient() {
                       <button
                         key={genre}
                         onClick={() => {
+                          let newGenres;
                           if (isSelected) {
-                            setSelectedGenres(selectedGenres.filter(g => g !== genre));
+                            newGenres = selectedGenres.filter(g => g !== genre);
                           } else {
-                            setSelectedGenres([...selectedGenres, genre]);
+                            newGenres = [...selectedGenres, genre];
                           }
+                          setSelectedGenres(newGenres);
+                          fetchBooks(searchQuery, newGenres);
                         }}
                         className={`group px-6 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 border-2 backdrop-blur-md relative overflow-hidden ${isSelected
                           ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-400 shadow-2xl shadow-indigo-500/50 scale-105'
@@ -949,8 +1023,16 @@ export default function LandingClient() {
           </div>
 
           {/* Books Grid - With increased spacing and smaller cards */}
-          {filteredBooks.length === 0 ? (
-            <div className="text-center py-12">
+          {loading ? (
+            <div className="mt-8">
+              <GridSkeleton count={14} />
+            </div>
+          ) : filteredBooks.length === 0 ? (
+            <div className="text-center py-20 animate-in fade-in zoom-in-95 duration-500">
+              {/* Empty state content remains managed by conditional above or separate component soon */}
+              <div className="w-24 h-24 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Search className="w-10 h-10 text-slate-400" />
+              </div>
               <p className="text-xl text-slate-400 mb-4">No books available yet.</p>
               <p className="text-sm text-slate-500">
                 {allBooks.length === 0
@@ -960,14 +1042,37 @@ export default function LandingClient() {
               </p>
             </div>
           ) : (
-            // 3. Replace the custom card mapping in the "All Books" section with BookCard.
-            <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 sm:gap-8 mb-8">
-              {filteredBooks.slice(0, booksToShow).map((book: any) => (
-                <StaggerItem key={book.id} className="h-full">
-                  <BookCard book={book} />
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.05
+                  }
+                }
+              }}
+              className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-4 mb-8"
+            >
+              <AnimatePresence mode='popLayout'>
+                {filteredBooks.slice(0, booksToShow).map((book: any) => (
+                  <motion.div
+                    key={book.id}
+                    layout
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                    }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="h-full"
+                  >
+                    <BookCard book={book} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           )}
 
           {/* Load More Button */}
