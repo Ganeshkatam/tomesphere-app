@@ -10,6 +10,7 @@ import { GetActiveAnnouncementsQueryHandler } from "@/modules/announcements/appl
 import { AnnouncementBanner } from "@/modules/announcements/presentation/components/AnnouncementBanner";
 import { AnnouncementNotice } from "@/modules/announcements/presentation/components/AnnouncementNotice";
 import CookieConsentBanner from "@/components/cookies/CookieConsentBanner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const atkinson = Atkinson_Hyperlegible({
   subsets: ["latin"],
@@ -129,6 +130,7 @@ export default async function RootLayout({
           <CookieConsentBanner />
           {children}
         </Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
