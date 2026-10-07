@@ -47,21 +47,11 @@ function getWorkerPool(): Pool {
 
 export interface ClaimedOutboxEvent {
   id: string;
-  aggregate_type: string;
-  aggregate_id: string;
   event_type: string;
-  event_version: number;
   payload: Record<string, unknown>;
   occurred_at: string;
-  status: string;
   retry_count: number;
-  last_error: string | null;
-  created_at: string;
-  processed_at: string | null;
-  claimed_at: string | null;
   lease_id: string;
-  lease_expires_at: string | null;
-  claimed_by: string | null;
 }
 
 export interface OutboxStatusMetrics {
@@ -86,9 +76,7 @@ export class WorkerDatabaseClient {
     leaseDurationSeconds: number = 300,
   ): Promise<ClaimedOutboxEvent[]> {
     const query = `
-      SELECT id, aggregate_type, aggregate_id, event_type, event_version, 
-             payload, occurred_at, status, retry_count, last_error, 
-             created_at, processed_at, claimed_at, lease_id, lease_expires_at, claimed_by
+      SELECT id, event_type, payload, occurred_at, retry_count, lease_id
       FROM internal.claim_outbox_events($1, $2, $3);
     `;
     const res = await this.pool.query<ClaimedOutboxEvent>(query, [

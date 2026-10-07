@@ -37,29 +37,24 @@ BEGIN
 END
 $$;
 
--- Drop legacy 1-argument overload to eliminate unfenced claim capabilities
-DO $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_proc p
-    JOIN pg_namespace n ON n.oid = p.pronamespace
-    WHERE n.nspname = 'internal'
-      AND p.proname = 'claim_outbox_events'
-      AND pronargs = 1
-  ) THEN
-    REVOKE ALL ON FUNCTION internal.claim_outbox_events(integer) FROM PUBLIC;
-    REVOKE ALL ON FUNCTION internal.claim_outbox_events(integer) FROM tomesphere_worker;
-    DROP FUNCTION internal.claim_outbox_events(integer);
-  END IF;
-END
-$$;
+-- Drop any legacy functions in public or internal schema to eliminate overloads and return-type conflicts
+DROP FUNCTION IF EXISTS public.claim_outbox_events(integer);
+DROP FUNCTION IF EXISTS internal.claim_outbox_events(integer);
+DROP FUNCTION IF EXISTS internal.claim_outbox_events(integer, text, integer);
 
 CREATE OR REPLACE FUNCTION internal.claim_outbox_events(
   limit_count integer,
   worker_identity text DEFAULT 'unknown',
   lease_duration_seconds integer DEFAULT 300
 )
-RETURNS SETOF public.outbox_events
+RETURNS TABLE (
+  id uuid,
+  event_type text,
+  payload jsonb,
+  occurred_at timestamptz,
+  retry_count integer,
+  lease_id uuid
+)
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
@@ -77,29 +72,34 @@ BEGIN
     RAISE EXCEPTION 'invalid worker identity';
   END IF;
 
-  -- Transition expired lease events that reached retry limits to dead_letter
+  -- Transition expired lease events that reached retry limits to dead_letter with forensic timestamp
   UPDATE public.outbox_events
   SET status = 'dead_letter',
       last_error = 'MAX_RETRIES_EXCEEDED_AFTER_LEASE_EXPIRATION',
       lease_id = NULL,
-      lease_expires_at = NULL
+      lease_expires_at = NULL,
+      processed_at = clock_timestamp()
   WHERE status = 'processing'
     AND lease_expires_at < clock_timestamp()
     AND retry_count >= 3;
 
   RETURN QUERY
   WITH candidates AS (
-    SELECT id
-    FROM public.outbox_events
-    WHERE status = 'pending'
-       OR (status = 'failed' AND retry_count < 3)
-       OR (status = 'processing' AND lease_expires_at < clock_timestamp() AND retry_count < 3)
-    ORDER BY created_at ASC, id ASC
+    SELECT c.id
+    FROM public.outbox_events c
+    WHERE c.status = 'pending'
+       OR (c.status = 'failed' AND c.retry_count < 3)
+       OR (c.status = 'processing' AND c.lease_expires_at < clock_timestamp() AND c.retry_count < 3)
+    ORDER BY c.created_at ASC, c.id ASC
     FOR UPDATE SKIP LOCKED
     LIMIT limit_count
   )
   UPDATE public.outbox_events AS e
   SET status = 'processing',
+      retry_count = CASE
+        WHEN e.status = 'processing' THEN e.retry_count + 1
+        ELSE e.retry_count
+      END,
       claimed_at = clock_timestamp(),
       lease_id = gen_random_uuid(),
       lease_expires_at = clock_timestamp() + make_interval(secs => lease_duration_seconds),
@@ -107,7 +107,7 @@ BEGIN
       processed_at = NULL
   FROM candidates
   WHERE e.id = candidates.id
-  RETURNING e.*;
+  RETURNING e.id, e.event_type, e.payload, e.occurred_at, e.retry_count, e.lease_id;
 END;
 $$;
 

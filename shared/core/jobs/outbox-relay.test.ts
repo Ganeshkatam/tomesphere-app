@@ -23,21 +23,11 @@ describe("Outbox Relay", () => {
 
   const createMockEvent = (overrides?: Partial<ClaimedOutboxEvent>): ClaimedOutboxEvent => ({
     id: "e1e1e1e1-e1e1-4e1e-8e1e-e1e1e1e1e1e1",
-    aggregate_type: "reading_session",
-    aggregate_id: "s1s1s1s1-s1s1-4s1s-8s1s-s1s1s1s1s1s1",
     event_type: "reader.session.started",
-    event_version: 1,
     payload: { sessionId: "s1", userId: "u1", bookId: "b1", startedAt: "2026-09-01T00:00:00Z" },
     occurred_at: "2026-09-01T00:00:00Z",
-    status: "processing",
     retry_count: 0,
-    last_error: null,
-    created_at: "2026-09-01T00:00:00Z",
-    processed_at: null,
-    claimed_at: "2026-09-01T00:01:00Z",
     lease_id: "l1l1l1l1-l1l1-4l1l-8l1l-l1l1l1l1l1l1",
-    lease_expires_at: "2026-09-01T00:06:00Z",
-    claimed_by: "worker-test",
     ...overrides,
   });
 
