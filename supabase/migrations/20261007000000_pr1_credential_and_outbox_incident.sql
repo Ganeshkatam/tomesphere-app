@@ -37,6 +37,30 @@ BEGIN
 END
 $$;
 
+-- Normalize any legacy rows stranded in 'failed' with retry_count >= 3
+UPDATE public.outbox_events
+SET status = 'dead_letter',
+    last_error = COALESCE(last_error, 'MAX_RETRIES_EXCEEDED_LEGACY_FAILED_STATE'),
+    processed_at = NULL,
+    lease_id = NULL,
+    lease_expires_at = NULL
+WHERE status = 'failed'
+  AND retry_count >= 3;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'public.outbox_events'::regclass
+      AND conname = 'outbox_events_failed_retry_ceiling_check'
+  ) THEN
+    ALTER TABLE public.outbox_events
+      ADD CONSTRAINT outbox_events_failed_retry_ceiling_check
+      CHECK (status <> 'failed' OR retry_count < 3);
+  END IF;
+END
+$$;
+
 -- Drop any legacy functions in public or internal schema to eliminate overloads and return-type conflicts
 DROP FUNCTION IF EXISTS public.claim_outbox_events(integer);
 DROP FUNCTION IF EXISTS internal.claim_outbox_events(integer);
@@ -81,6 +105,16 @@ BEGIN
       processed_at = NULL
   WHERE status = 'processing'
     AND lease_expires_at < clock_timestamp()
+    AND retry_count >= 3;
+
+  -- Self-healing: transition any stranded failed events with retry_count >= 3 to dead_letter
+  UPDATE public.outbox_events
+  SET status = 'dead_letter',
+      last_error = COALESCE(last_error, 'MAX_RETRIES_EXCEEDED_AFTER_FAILURE'),
+      lease_id = NULL,
+      lease_expires_at = NULL,
+      processed_at = NULL
+  WHERE status = 'failed'
     AND retry_count >= 3;
 
   RETURN QUERY
