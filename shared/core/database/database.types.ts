@@ -884,27 +884,36 @@ export type Database = {
       login_notifications_log: {
         Row: {
           attempts: number
+          claimed_at: string | null
           created_at: string
+          idempotency_key: string | null
           last_error: string | null
           processed_at: string | null
+          request_id: string | null
           session_id: string
           status: string
           user_id: string
         }
         Insert: {
           attempts?: number
+          claimed_at?: string | null
           created_at?: string
+          idempotency_key?: string | null
           last_error?: string | null
           processed_at?: string | null
+          request_id?: string | null
           session_id: string
           status: string
           user_id: string
         }
         Update: {
           attempts?: number
+          claimed_at?: string | null
           created_at?: string
+          idempotency_key?: string | null
           last_error?: string | null
           processed_at?: string | null
+          request_id?: string | null
           session_id?: string
           status?: string
           user_id?: string
@@ -991,11 +1000,14 @@ export type Database = {
           aggregate_id: string
           aggregate_type: string
           claimed_at: string | null
+          claimed_by: string | null
           created_at: string | null
           event_type: string
           event_version: number
           id: string
           last_error: string | null
+          lease_expires_at: string | null
+          lease_id: string | null
           occurred_at: string
           payload: Json
           processed_at: string | null
@@ -1006,11 +1018,14 @@ export type Database = {
           aggregate_id: string
           aggregate_type: string
           claimed_at?: string | null
+          claimed_by?: string | null
           created_at?: string | null
           event_type: string
           event_version?: number
           id?: string
           last_error?: string | null
+          lease_expires_at?: string | null
+          lease_id?: string | null
           occurred_at?: string
           payload: Json
           processed_at?: string | null
@@ -1021,11 +1036,14 @@ export type Database = {
           aggregate_id?: string
           aggregate_type?: string
           claimed_at?: string | null
+          claimed_by?: string | null
           created_at?: string | null
           event_type?: string
           event_version?: number
           id?: string
           last_error?: string | null
+          lease_expires_at?: string | null
+          lease_id?: string | null
           occurred_at?: string
           payload?: Json
           processed_at?: string | null
@@ -1749,17 +1767,20 @@ export type Database = {
           raw_views: number
         }[]
       }
-      claim_outbox_events: {
+      claim_outbox_events_legacy_pub_v0: {
         Args: { limit_count: number }
         Returns: {
           aggregate_id: string
           aggregate_type: string
           claimed_at: string | null
+          claimed_by: string | null
           created_at: string | null
           event_type: string
           event_version: number
           id: string
           last_error: string | null
+          lease_expires_at: string | null
+          lease_id: string | null
           occurred_at: string
           payload: Json
           processed_at: string | null
@@ -2051,12 +2072,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2080,11 +2101,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2105,11 +2126,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2130,11 +2151,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2147,11 +2168,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

@@ -6,87 +6,94 @@ const MAX_RETRIES = parseInt(process.env.OUTBOX_MAX_RETRIES || "3", 10);
 /**
  * Outbox Relay
  *
- * Polls `outbox_events` for pending events, dispatches them to the
- * in-memory EventBus, and marks them as processed.
+ * Polls `outbox_events` for pending events with fenced leases, dispatches them to the
+ * in-memory EventBus, and marks them as completed via internal scoped capabilities.
  *
  * Design decisions:
  * - Uses `WorkerDatabaseClient` via direct PostgreSQL connection using `tomesphere_worker` role.
- * - Invokes `internal.claim_outbox_events` RPC for safe concurrent claiming (FOR UPDATE SKIP LOCKED).
- * - Implements exponential backoff on failure.
- * - Marks permanently failed events as `failed_permanent` after MAX_RETRIES.
+ * - Invokes `internal.claim_outbox_events` RPC for safe concurrent claiming with lease fencing (FOR UPDATE SKIP LOCKED).
+ * - Invokes `internal.complete_outbox_event` RPC for state transitions with lease validation.
+ * - Never mutates `public.outbox_events` directly.
  * - Does NOT use SUPABASE_SERVICE_ROLE_KEY or PostgREST Data API.
  */
 
 export interface OutboxRelayResult {
   processed: number;
   failed: number;
-  permanentlyFailed: number;
+  deadLetter: number;
 }
 
 export async function processOutbox(
   eventBus: IEventBus,
+  workerIdentity: string = `worker-${process.pid || "node"}`,
 ): Promise<OutboxRelayResult> {
-  // 1. Claim pending events atomically via WorkerDatabaseClient
+  // 1. Claim pending events atomically with fenced lease
   let events;
   try {
-    events = await WorkerDatabaseClient.claimOutboxEvents(50);
-  } catch (claimError: any) {
+    events = await WorkerDatabaseClient.claimOutboxEvents(50, workerIdentity, 300);
+  } catch (claimError: unknown) {
+    const message = claimError instanceof Error ? claimError.message : String(claimError);
     console.error(
       "[Outbox Relay] Failed to claim events via WorkerDatabaseClient:",
-      claimError.message,
+      message,
     );
-    return { processed: 0, failed: 0, permanentlyFailed: 0 };
+    return { processed: 0, failed: 0, deadLetter: 0 };
   }
 
   if (!events || events.length === 0) {
-    return { processed: 0, failed: 0, permanentlyFailed: 0 };
+    return { processed: 0, failed: 0, deadLetter: 0 };
   }
 
   let processed = 0;
   let failed = 0;
-  let permanentlyFailed = 0;
+  let deadLetter = 0;
 
   // 2. Process each claimed event
   for (const event of events) {
     try {
-      const eventType = event.event_type as any;
-      const payload = event.payload as any;
+      const eventType = event.event_type as keyof import("../../core/events/types").EventPayloads;
+      const payload = event.payload as import("../../core/events/types").EventPayloads[typeof eventType];
 
       eventBus.emit(eventType, payload);
 
-      // 3. Mark as processed via direct worker query
-      await WorkerDatabaseClient.query(
-        `UPDATE public.outbox_events 
-         SET status = 'processed', processed_at = NOW() 
-         WHERE id = $1;`,
-        [event.id]
+      // 3. Mark as processed via fenced complete RPC
+      await WorkerDatabaseClient.completeOutboxEvent(
+        event.id,
+        event.lease_id,
+        "processed",
       );
 
       processed++;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMsg = error instanceof Error ? error.message : "Unknown error";
       const newRetryCount = (event.retry_count || 0) + 1;
-      const isPermanentFailure = newRetryCount >= MAX_RETRIES;
+      // Invariant: When the resulting retry count reaches or exceeds MAX_RETRIES (3), the worker
+      // must transition directly to 'dead_letter'; 'failed' is permitted only when retry_count remains strictly < 3.
+      const isDeadLetter = newRetryCount >= MAX_RETRIES;
 
-      await WorkerDatabaseClient.query(
-        `UPDATE public.outbox_events 
-         SET status = $1, retry_count = $2, last_error = $3 
-         WHERE id = $4;`,
-        [
-          isPermanentFailure ? "failed_permanent" : "failed",
-          newRetryCount,
-          error.message || "Unknown error",
+      try {
+        await WorkerDatabaseClient.completeOutboxEvent(
           event.id,
-        ]
-      );
-
-      if (isPermanentFailure) {
-        console.error(
-          `[Outbox Relay] Permanently failed event ${event.id}: ${error.message}`,
+          event.lease_id,
+          isDeadLetter ? "dead_letter" : "failed",
+          errorMsg,
         );
-        permanentlyFailed++;
+      } catch (completeErr: unknown) {
+        const fenceMsg = completeErr instanceof Error ? completeErr.message : String(completeErr);
+        console.error(
+          `[Outbox Relay] Lease fencing violation or completion failure for event ${event.id}:`,
+          fenceMsg,
+        );
+      }
+
+      if (isDeadLetter) {
+        console.error(
+          `[Outbox Relay] Permanently failed event ${event.id} (transitioned to dead_letter): ${errorMsg}`,
+        );
+        deadLetter++;
       } else {
         console.warn(
-          `[Outbox Relay] Retryable failure for event ${event.id} (attempt ${newRetryCount}/${MAX_RETRIES})`,
+          `[Outbox Relay] Retryable failure for event ${event.id} (attempt ${newRetryCount}/${MAX_RETRIES}): ${errorMsg}`,
         );
         failed++;
       }
@@ -94,39 +101,21 @@ export async function processOutbox(
   }
 
   console.log(
-    `[Outbox Relay] Batch complete: ${processed} processed, ${failed} failed, ${permanentlyFailed} permanently failed`,
+    `[Outbox Relay] Batch complete: ${processed} processed, ${failed} failed, ${deadLetter} dead letter`,
   );
 
-  return { processed, failed, permanentlyFailed };
+  return { processed, failed, deadLetter };
 }
 
 /**
- * Returns operational metrics for monitoring.
+ * Returns operational metrics for monitoring from internal.get_outbox_metrics.
  */
 export async function getOutboxMetrics() {
   try {
-    const res = await WorkerDatabaseClient.query<{
-      status: string;
-      count: string;
-    }>(
-      `SELECT status, COUNT(*)::text as count 
-       FROM public.outbox_events 
-       GROUP BY status;`
-    );
-
-    const counts: Record<string, number> = {};
-    for (const row of res.rows) {
-      counts[row.status] = parseInt(row.count, 10);
-    }
-
-    return {
-      pending: counts["pending"] || 0,
-      processing: counts["processing"] || 0,
-      failed: counts["failed"] || 0,
-      permanentlyFailed: counts["failed_permanent"] || 0,
-    };
-  } catch (error: any) {
-    console.error("[Outbox Relay] Failed to fetch outbox metrics:", error.message);
+    return await WorkerDatabaseClient.getOutboxMetrics();
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[Outbox Relay] Failed to fetch outbox metrics:", message);
     return null;
   }
 }
