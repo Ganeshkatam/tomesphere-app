@@ -19,6 +19,10 @@ CREATE INDEX IF NOT EXISTS idx_outbox_events_lease
   ON public.outbox_events (status, lease_expires_at)
   WHERE status = 'processing';
 
+ALTER TABLE public.outbox_events
+  DROP CONSTRAINT IF EXISTS outbox_messages_status_check,
+  DROP CONSTRAINT IF EXISTS outbox_events_status_check;
+
 DO $$
 BEGIN
   IF NOT EXISTS (
