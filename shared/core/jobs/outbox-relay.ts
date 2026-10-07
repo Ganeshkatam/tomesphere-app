@@ -20,7 +20,7 @@ const MAX_RETRIES = parseInt(process.env.OUTBOX_MAX_RETRIES || "3", 10);
 export interface OutboxRelayResult {
   processed: number;
   failed: number;
-  permanentlyFailed: number;
+  deadLetter: number;
 }
 
 export async function processOutbox(
@@ -37,16 +37,16 @@ export async function processOutbox(
       "[Outbox Relay] Failed to claim events via WorkerDatabaseClient:",
       message,
     );
-    return { processed: 0, failed: 0, permanentlyFailed: 0 };
+    return { processed: 0, failed: 0, deadLetter: 0 };
   }
 
   if (!events || events.length === 0) {
-    return { processed: 0, failed: 0, permanentlyFailed: 0 };
+    return { processed: 0, failed: 0, deadLetter: 0 };
   }
 
   let processed = 0;
   let failed = 0;
-  let permanentlyFailed = 0;
+  let deadLetter = 0;
 
   // 2. Process each claimed event
   for (const event of events) {
@@ -88,7 +88,7 @@ export async function processOutbox(
         console.error(
           `[Outbox Relay] Permanently failed event ${event.id} (transitioned to dead_letter): ${errorMsg}`,
         );
-        permanentlyFailed++;
+        deadLetter++;
       } else {
         console.warn(
           `[Outbox Relay] Retryable failure for event ${event.id} (attempt ${newRetryCount}/${MAX_RETRIES}): ${errorMsg}`,
@@ -99,10 +99,10 @@ export async function processOutbox(
   }
 
   console.log(
-    `[Outbox Relay] Batch complete: ${processed} processed, ${failed} failed, ${permanentlyFailed} permanently failed`,
+    `[Outbox Relay] Batch complete: ${processed} processed, ${failed} failed, ${deadLetter} dead letter`,
   );
 
-  return { processed, failed, permanentlyFailed };
+  return { processed, failed, deadLetter };
 }
 
 /**
