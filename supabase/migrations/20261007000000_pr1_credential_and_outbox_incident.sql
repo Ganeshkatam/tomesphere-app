@@ -99,13 +99,14 @@ BEGIN
   -- Transition expired lease events that reached retry limits to dead_letter (processed_at reserved strictly for success)
   UPDATE public.outbox_events
   SET status = 'dead_letter',
+      retry_count = retry_count + 1,
       last_error = 'MAX_RETRIES_EXCEEDED_AFTER_LEASE_EXPIRATION',
       lease_id = NULL,
       lease_expires_at = NULL,
       processed_at = NULL
   WHERE status = 'processing'
     AND lease_expires_at < clock_timestamp()
-    AND retry_count >= 3;
+    AND retry_count >= 2;
 
   -- Self-healing: transition any stranded failed events with retry_count >= 3 to dead_letter
   UPDATE public.outbox_events
@@ -123,7 +124,7 @@ BEGIN
     FROM public.outbox_events c
     WHERE c.status = 'pending'
        OR (c.status = 'failed' AND c.retry_count < 3)
-       OR (c.status = 'processing' AND c.lease_expires_at < clock_timestamp() AND c.retry_count < 3)
+       OR (c.status = 'processing' AND c.lease_expires_at < clock_timestamp() AND c.retry_count < 2)
     ORDER BY c.created_at ASC, c.id ASC
     FOR UPDATE SKIP LOCKED
     LIMIT limit_count
