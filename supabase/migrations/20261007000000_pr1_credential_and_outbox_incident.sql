@@ -1,0 +1,169 @@
+-- PR1: credential containment + outbox incident hardening
+-- Establishes fenced worker leases and strict outbox state transitions.
+
+ALTER TABLE public.login_notifications_log
+  ADD COLUMN IF NOT EXISTS claimed_at timestamptz,
+  ADD COLUMN IF NOT EXISTS request_id uuid,
+  ADD COLUMN IF NOT EXISTS idempotency_key uuid;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_login_notifications_log_idempotency_key
+  ON public.login_notifications_log (idempotency_key)
+  WHERE idempotency_key IS NOT NULL;
+
+ALTER TABLE public.outbox_events
+  ADD COLUMN IF NOT EXISTS lease_id uuid,
+  ADD COLUMN IF NOT EXISTS lease_expires_at timestamptz,
+  ADD COLUMN IF NOT EXISTS claimed_by text;
+
+CREATE INDEX IF NOT EXISTS idx_outbox_events_lease
+  ON public.outbox_events (status, lease_expires_at)
+  WHERE status = 'processing';
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'public.outbox_events'::regclass
+      AND conname = 'outbox_events_status_check_pr1'
+  ) THEN
+    ALTER TABLE public.outbox_events
+      ADD CONSTRAINT outbox_events_status_check_pr1
+      CHECK (status IN ('pending', 'processing', 'processed', 'failed', 'dead_letter'));
+  END IF;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION internal.claim_outbox_events(
+  limit_count integer,
+  worker_identity text DEFAULT 'unknown',
+  lease_duration_seconds integer DEFAULT 300
+)
+RETURNS SETOF public.outbox_events
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  IF limit_count < 1 OR limit_count > 100 THEN
+    RAISE EXCEPTION 'invalid outbox batch size';
+  END IF;
+
+  IF lease_duration_seconds < 30 OR lease_duration_seconds > 3600 THEN
+    RAISE EXCEPTION 'invalid outbox lease duration';
+  END IF;
+
+  IF worker_identity IS NULL OR length(btrim(worker_identity)) = 0 OR length(worker_identity) > 128 THEN
+    RAISE EXCEPTION 'invalid worker identity';
+  END IF;
+
+  RETURN QUERY
+  WITH candidates AS (
+    SELECT id
+    FROM public.outbox_events
+    WHERE status = 'pending'
+       OR (status = 'failed' AND retry_count < 3)
+       OR (status = 'processing' AND lease_expires_at < clock_timestamp())
+    ORDER BY created_at ASC, id ASC
+    FOR UPDATE SKIP LOCKED
+    LIMIT limit_count
+  )
+  UPDATE public.outbox_events AS e
+  SET status = 'processing',
+      claimed_at = clock_timestamp(),
+      lease_id = gen_random_uuid(),
+      lease_expires_at = clock_timestamp() + make_interval(secs => lease_duration_seconds),
+      claimed_by = worker_identity,
+      processed_at = NULL
+  FROM candidates
+  WHERE e.id = candidates.id
+  RETURNING e.*;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION internal.complete_outbox_event(
+  p_event_id uuid,
+  p_lease_id uuid,
+  p_status text,
+  p_error text DEFAULT NULL
+)
+RETURNS public.outbox_events
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  v_event public.outbox_events;
+  v_next_retry integer;
+BEGIN
+  IF p_status NOT IN ('processed', 'failed', 'dead_letter') THEN
+    RAISE EXCEPTION 'invalid outbox completion status';
+  END IF;
+
+  IF p_lease_id IS NULL THEN
+    RAISE EXCEPTION 'outbox lease is required';
+  END IF;
+
+  SELECT * INTO v_event
+  FROM public.outbox_events
+  WHERE id = p_event_id
+  FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'outbox event not found';
+  END IF;
+
+  IF v_event.status <> 'processing' THEN
+    RAISE EXCEPTION 'invalid outbox state transition';
+  END IF;
+
+  IF v_event.lease_id IS DISTINCT FROM p_lease_id
+     OR v_event.lease_expires_at IS NULL
+     OR v_event.lease_expires_at < clock_timestamp() THEN
+    RAISE EXCEPTION 'outbox lease is invalid or expired';
+  END IF;
+
+  v_next_retry := COALESCE(v_event.retry_count, 0);
+
+  IF p_status = 'failed' THEN
+    v_next_retry := v_next_retry + 1;
+    IF v_next_retry >= 3 THEN
+      RAISE EXCEPTION 'retry limit reached; use dead_letter';
+    END IF;
+  ELSIF p_status = 'dead_letter' THEN
+    v_next_retry := v_next_retry + 1;
+  END IF;
+
+  UPDATE public.outbox_events
+  SET status = p_status,
+      retry_count = v_next_retry,
+      last_error = CASE WHEN p_status = 'processed' THEN NULL ELSE left(p_error, 4000) END,
+      processed_at = CASE WHEN p_status = 'processed' THEN clock_timestamp() ELSE NULL END,
+      lease_id = NULL,
+      lease_expires_at = NULL,
+      claimed_by = NULL
+  WHERE id = p_event_id
+  RETURNING * INTO v_event;
+
+  RETURN v_event;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION internal.get_outbox_metrics()
+RETURNS TABLE(status text, event_count bigint)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT status::text, count(*)::bigint
+  FROM public.outbox_events
+  GROUP BY status
+  ORDER BY status;
+$$;
+
+REVOKE ALL ON FUNCTION internal.claim_outbox_events(integer, text, integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION internal.complete_outbox_event(uuid, uuid, text, text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION internal.get_outbox_metrics() FROM PUBLIC;
+
+GRANT EXECUTE ON FUNCTION internal.claim_outbox_events(integer, text, integer) TO tomesphere_worker;
+GRANT EXECUTE ON FUNCTION internal.complete_outbox_event(uuid, uuid, text, text) TO tomesphere_worker;
+GRANT EXECUTE ON FUNCTION internal.get_outbox_metrics() TO tomesphere_worker;
