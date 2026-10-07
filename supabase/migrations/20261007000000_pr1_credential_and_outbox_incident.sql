@@ -65,8 +65,10 @@ $$;
 DROP FUNCTION IF EXISTS public.claim_outbox_events(integer);
 DROP FUNCTION IF EXISTS internal.claim_outbox_events(integer);
 DROP FUNCTION IF EXISTS internal.claim_outbox_events(integer, text, integer);
+DROP FUNCTION IF EXISTS internal.complete_outbox_event(uuid, uuid, text, text);
+DROP FUNCTION IF EXISTS internal.get_outbox_metrics();
 
-CREATE OR REPLACE FUNCTION internal.claim_outbox_events(
+CREATE FUNCTION internal.claim_outbox_events(
   limit_count integer,
   worker_identity text DEFAULT 'unknown',
   lease_duration_seconds integer DEFAULT 300
@@ -146,7 +148,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION internal.complete_outbox_event(
+CREATE FUNCTION internal.complete_outbox_event(
   p_event_id uuid,
   p_lease_id uuid,
   p_status text,
@@ -213,7 +215,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION internal.get_outbox_metrics()
+CREATE FUNCTION internal.get_outbox_metrics()
 RETURNS TABLE(status text, event_count bigint)
 LANGUAGE sql
 SECURITY DEFINER
@@ -225,9 +227,16 @@ AS $$
   ORDER BY status;
 $$;
 
-REVOKE ALL ON FUNCTION internal.claim_outbox_events(integer, text, integer) FROM PUBLIC;
-REVOKE ALL ON FUNCTION internal.complete_outbox_event(uuid, uuid, text, text) FROM PUBLIC;
-REVOKE ALL ON FUNCTION internal.get_outbox_metrics() FROM PUBLIC;
+-- Schema-level privileges
+REVOKE ALL ON SCHEMA internal FROM PUBLIC;
+REVOKE ALL ON SCHEMA internal FROM anon;
+REVOKE ALL ON SCHEMA internal FROM authenticated;
+GRANT USAGE ON SCHEMA internal TO tomesphere_worker;
+
+-- Function-level privileges
+REVOKE ALL ON FUNCTION internal.claim_outbox_events(integer, text, integer) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION internal.complete_outbox_event(uuid, uuid, text, text) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION internal.get_outbox_metrics() FROM PUBLIC, anon, authenticated;
 
 GRANT EXECUTE ON FUNCTION internal.claim_outbox_events(integer, text, integer) TO tomesphere_worker;
 GRANT EXECUTE ON FUNCTION internal.complete_outbox_event(uuid, uuid, text, text) TO tomesphere_worker;
