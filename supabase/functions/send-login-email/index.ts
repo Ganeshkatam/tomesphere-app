@@ -46,13 +46,13 @@ function constantTimeEqual(a: string, b: string): boolean {
 
 serve(async (req: Request) => {
   const requestIdHeader = req.headers.get("x-request-id");
-  if (requestIdHeader && !isValidUuid(requestIdHeader)) {
+  if (!requestIdHeader || !isValidUuid(requestIdHeader)) {
     return new Response(
-      JSON.stringify({ error: "Invalid X-Request-ID header format; must be UUIDv4" }),
+      JSON.stringify({ error: "Missing or invalid X-Request-ID header; must be UUIDv4" }),
       { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
-  const requestId = requestIdHeader ?? crypto.randomUUID();
+  const requestId = requestIdHeader;
 
   try {
     // 1. Authenticate Inbound Webhook
@@ -82,27 +82,32 @@ serve(async (req: Request) => {
       );
     }
 
-    // 2. Validate Request Timestamp Window (300 seconds)
+    // 2. Validate Request Timestamp Window (mandatory, +/- 300 seconds)
     const timestampHeader = req.headers.get("x-timestamp");
-    if (timestampHeader) {
-      const parsedTime = Date.parse(timestampHeader);
-      if (isNaN(parsedTime) || Math.abs(Date.now() - parsedTime) > 300_000) {
-        return new Response(
-          JSON.stringify({ error: "Request timestamp outside permitted window", requestId }),
-          { status: 400, headers: { "Content-Type": "application/json" } },
-        );
-      }
+    if (!timestampHeader) {
+      return new Response(
+        JSON.stringify({ error: "Missing mandatory X-Timestamp header", requestId }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
+    const parsedTime = Date.parse(timestampHeader);
+    if (isNaN(parsedTime) || Math.abs(Date.now() - parsedTime) > 300_000) {
+      return new Response(
+        JSON.stringify({ error: "Request timestamp outside permitted 300-second window", requestId }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
     }
 
     // 3. Pre-Claim Payload & Bounds Validation
     const idempotencyHeader = req.headers.get("idempotency-key");
-    if (idempotencyHeader && !isValidUuid(idempotencyHeader)) {
+    if (!idempotencyHeader || !isValidUuid(idempotencyHeader)) {
       return new Response(
-        JSON.stringify({ error: "Invalid Idempotency-Key header format; must be UUIDv4", requestId }),
+        JSON.stringify({ error: "Missing or invalid Idempotency-Key header; must be UUIDv4", requestId }),
         { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
-    const idempotencyKey = idempotencyHeader ?? null;
+    const idempotencyKey = idempotencyHeader;
 
     let rawBody: unknown;
     try {
@@ -163,14 +168,6 @@ serve(async (req: Request) => {
       user_agent: userAgentBounded,
       ip: ipBounded,
     };
-
-    // If x-timestamp header was omitted, log warning if record timestamp is outside window
-    if (!timestampHeader) {
-      const recordTime = Date.parse(session.created_at);
-      if (Math.abs(Date.now() - recordTime) > 300_000) {
-        console.warn(`[send-login-email] Session timestamp ${session.created_at} is outside 5-minute window.`);
-      }
-    }
 
     // 4. Initialize Privileged Internal Supabase Client
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
