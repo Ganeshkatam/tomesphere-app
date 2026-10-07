@@ -59,7 +59,7 @@ describe("Outbox Relay", () => {
       expect(result).toEqual({ processed: 0, failed: 0, deadLetter: 0 });
     });
 
-    it("transitions failed event to failed when retry_count is below MAX_RETRIES", async () => {
+    it("transitions failed event to failed when retry_count is below MAX_RETRIES (first failure)", async () => {
       const mockEvent = createMockEvent({ retry_count: 0 });
       (WorkerDatabaseClient.claimOutboxEvents as jest.Mock).mockResolvedValue([mockEvent]);
       mockEventBus.emit.mockImplementation(() => {
@@ -74,6 +74,25 @@ describe("Outbox Relay", () => {
         mockEvent.lease_id,
         "failed",
         "Handler execution crashed",
+      );
+      expect(result).toEqual({ processed: 0, failed: 1, deadLetter: 0 });
+    });
+
+    it("transitions failed event to failed on intermediate retry (second failure)", async () => {
+      const mockEvent = createMockEvent({ retry_count: 1 }); // Next attempt: 2 < MAX_RETRIES (3)
+      (WorkerDatabaseClient.claimOutboxEvents as jest.Mock).mockResolvedValue([mockEvent]);
+      mockEventBus.emit.mockImplementation(() => {
+        throw new Error("Intermediate transient failure");
+      });
+      (WorkerDatabaseClient.completeOutboxEvent as jest.Mock).mockResolvedValue(mockEvent);
+
+      const result = await processOutbox(mockEventBus);
+
+      expect(WorkerDatabaseClient.completeOutboxEvent).toHaveBeenCalledWith(
+        mockEvent.id,
+        mockEvent.lease_id,
+        "failed",
+        "Intermediate transient failure",
       );
       expect(result).toEqual({ processed: 0, failed: 1, deadLetter: 0 });
     });

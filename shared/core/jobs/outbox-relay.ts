@@ -67,6 +67,8 @@ export async function processOutbox(
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
       const newRetryCount = (event.retry_count || 0) + 1;
+      // Invariant: When the resulting retry count reaches or exceeds MAX_RETRIES (3), the worker
+      // must transition directly to 'dead_letter'; 'failed' is permitted only when retry_count remains strictly < 3.
       const isDeadLetter = newRetryCount >= MAX_RETRIES;
 
       try {

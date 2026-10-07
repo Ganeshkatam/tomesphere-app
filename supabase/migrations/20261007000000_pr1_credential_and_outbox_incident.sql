@@ -72,13 +72,13 @@ BEGIN
     RAISE EXCEPTION 'invalid worker identity';
   END IF;
 
-  -- Transition expired lease events that reached retry limits to dead_letter with forensic timestamp
+  -- Transition expired lease events that reached retry limits to dead_letter (processed_at reserved strictly for success)
   UPDATE public.outbox_events
   SET status = 'dead_letter',
       last_error = 'MAX_RETRIES_EXCEEDED_AFTER_LEASE_EXPIRATION',
       lease_id = NULL,
       lease_expires_at = NULL,
-      processed_at = clock_timestamp()
+      processed_at = NULL
   WHERE status = 'processing'
     AND lease_expires_at < clock_timestamp()
     AND retry_count >= 3;
