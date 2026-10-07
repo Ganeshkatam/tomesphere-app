@@ -37,6 +37,23 @@ BEGIN
 END
 $$;
 
+-- Drop legacy 1-argument overload to eliminate unfenced claim capabilities
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'internal'
+      AND p.proname = 'claim_outbox_events'
+      AND pronargs = 1
+  ) THEN
+    REVOKE ALL ON FUNCTION internal.claim_outbox_events(integer) FROM PUBLIC;
+    REVOKE ALL ON FUNCTION internal.claim_outbox_events(integer) FROM tomesphere_worker;
+    DROP FUNCTION internal.claim_outbox_events(integer);
+  END IF;
+END
+$$;
+
 CREATE OR REPLACE FUNCTION internal.claim_outbox_events(
   limit_count integer,
   worker_identity text DEFAULT 'unknown',
