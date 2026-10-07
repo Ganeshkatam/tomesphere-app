@@ -77,13 +77,23 @@ BEGIN
     RAISE EXCEPTION 'invalid worker identity';
   END IF;
 
+  -- Transition expired lease events that reached retry limits to dead_letter
+  UPDATE public.outbox_events
+  SET status = 'dead_letter',
+      last_error = 'MAX_RETRIES_EXCEEDED_AFTER_LEASE_EXPIRATION',
+      lease_id = NULL,
+      lease_expires_at = NULL
+  WHERE status = 'processing'
+    AND lease_expires_at < clock_timestamp()
+    AND retry_count >= 3;
+
   RETURN QUERY
   WITH candidates AS (
     SELECT id
     FROM public.outbox_events
     WHERE status = 'pending'
        OR (status = 'failed' AND retry_count < 3)
-       OR (status = 'processing' AND lease_expires_at < clock_timestamp())
+       OR (status = 'processing' AND lease_expires_at < clock_timestamp() AND retry_count < 3)
     ORDER BY created_at ASC, id ASC
     FOR UPDATE SKIP LOCKED
     LIMIT limit_count
@@ -160,8 +170,7 @@ BEGIN
       last_error = CASE WHEN p_status = 'processed' THEN NULL ELSE left(p_error, 4000) END,
       processed_at = CASE WHEN p_status = 'processed' THEN clock_timestamp() ELSE NULL END,
       lease_id = NULL,
-      lease_expires_at = NULL,
-      claimed_by = NULL
+      lease_expires_at = NULL
   WHERE id = p_event_id
   RETURNING * INTO v_event;
 
