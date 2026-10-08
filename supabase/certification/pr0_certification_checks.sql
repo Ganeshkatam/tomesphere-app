@@ -1,13 +1,22 @@
 -- ============================================================================
--- PR0 PRODUCTION SECURITY CONTAINMENT: CERTIFICATION RUNBOOK & READ-ONLY CHECKS
+-- PR0 PRODUCTION SECURITY CONTAINMENT: PHASED CERTIFICATION RUNBOOK
 -- ============================================================================
--- This package provides non-mutating / read-only SQL queries and validation
--- scripts for the operator to certify production containment after deployment.
+-- GOVERNANCE: Execute in phased stages. Do NOT run as a single script.
+-- Stop immediately on any unexpected result.
+--
+-- EXECUTION SEQUENCE:
+-- Stage 1: Rotate/set WEBHOOK_SECRET in Supabase Project Secrets
+-- Stage 2: Deploy send-login-email Edge Function
+-- Stage 3: Verify Webhook Behavior (HTTP verification via curl)
+-- Stage 4: Apply PR0 DB migration (20261008000000_pr0_production_security_containment.sql)
+-- Stage 5: Verify DB Privilege Containment (Read-only catalog inspection)
+-- Stage 6: Verify Simulated Client Privilege Denial (Rollback DO block)
+-- Stage 7: End-to-end smoke verification & certification record
 -- ============================================================================
 
--- ----------------------------------------------------------------------------
--- 1. VERIFY OUTBOX PERMISSION CONTAINMENT
--- ----------------------------------------------------------------------------
+-- ============================================================================
+-- STAGE 5: READ-ONLY CATALOG INSPECTION (Run after applying migration)
+-- ============================================================================
 -- Confirms that 'authenticated', 'anon', and 'public' roles have NO write
 -- privileges on public.outbox_events, and the permissive policy is removed.
 
