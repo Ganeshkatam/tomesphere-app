@@ -3,20 +3,13 @@ import { BookRepository } from "@/modules/books/domain/repositories/BookReposito
 import { BookId } from "@/modules/books/domain/value-objects";
 import { ReaderAccessDto } from "../dto/ReaderAccessDto";
 import { evaluateReaderAccess } from "../policy/ReaderAccessPolicy";
+import { assertCanonicalBookObjectKey } from "../policy/CanonicalStorageKey";
+import { ReaderAccessError } from "../errors/ReaderAccessError";
 import { createSupabaseAdminClient } from "@/shared/core/database/admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/shared/core/types/database";
 
-export class ReaderAccessError extends Error {
-  constructor(
-    message: string,
-    public readonly statusCode: number,
-    public readonly code: string,
-  ) {
-    super(message);
-    this.name = "ReaderAccessError";
-  }
-}
+export { ReaderAccessError };
 
 export class ReaderAccessService {
   constructor(
@@ -53,8 +46,8 @@ export class ReaderAccessService {
           throw new ReaderAccessError("Book is archived", 403, "BOOK_ARCHIVED");
         case "BOOK_UNPUBLISHED":
           throw new ReaderAccessError("Book is unpublished", 403, "BOOK_UNPUBLISHED");
-        case "NOT_ENTITLED":
-          throw new ReaderAccessError("Not entitled to read this book", 403, "NOT_ENTITLED");
+        case "MEMBER_ACCESS_DENIED":
+          throw new ReaderAccessError("Not authorized to read this book", 403, "MEMBER_ACCESS_DENIED");
         default:
           throw new ReaderAccessError("Access denied", 403, "ACCESS_DENIED");
       }
@@ -62,26 +55,18 @@ export class ReaderAccessService {
 
     const primaryFile = bookEntity.getPrimaryFile();
     if (!primaryFile || !primaryFile.storagePath) {
-      throw new ReaderAccessError("Book content file not available", 404, "FILE_NOT_FOUND");
+      throw new ReaderAccessError(
+        "Primary content file unavailable",
+        404,
+        "PRIMARY_CONTENT_FILE_UNAVAILABLE",
+      );
     }
 
-    // Resolve relative canonical object key from storage_path
-    let objectKey = primaryFile.storagePath.trim();
-    if (objectKey.startsWith("http://") || objectKey.startsWith("https://")) {
-      try {
-        const parsed = new URL(objectKey);
-        // Extracts path after /storage/v1/object/public/book-pdfs/ or /storage/v1/object/sign/book-pdfs/
-        const match = parsed.pathname.match(/\/book-pdfs\/(.+)$/);
-        objectKey = match ? decodeURIComponent(match[1]) : objectKey;
-      } catch {
-        // Fallback for non-standard URL strings
-        const match = objectKey.match(/\/book-pdfs\/(.+)$/);
-        objectKey = match ? decodeURIComponent(match[1]) : objectKey;
-      }
-    }
-
-    // Strip any residual bucket prefix or leading slashes
-    objectKey = objectKey.replace(/^book-pdfs\//, "").replace(/^\/+/, "");
+    // Enforce canonical object key contract without legacy URL parsing fallbacks
+    const objectKey = assertCanonicalBookObjectKey(
+      primaryFile.storagePath,
+      bookEntity.bookId.value,
+    );
 
     const adminStorage =
       this.storageAdminClient || createSupabaseAdminClient();

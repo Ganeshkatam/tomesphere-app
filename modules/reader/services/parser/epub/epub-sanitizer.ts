@@ -121,9 +121,13 @@ export function sanitizeEpubDocument(doc: Document): void {
 }
 
 /**
- * Hardens the iframe hosting the EPUB rendition:
- * - Enforces sandbox="allow-same-origin" (disallowing scripts, popups, and top navigation)
- * - Traps and isolates window.parent and window.top access
+ * Hardens the iframe hosting the EPUB rendition.
+ *
+ * ARCHITECTURAL SECURITY INVARIANT:
+ * The iframe sandbox attribute (without 'allow-scripts') together with strict CSP
+ * is the primary security boundary enforced by the browser.
+ * Window property neutralization (window.parent, window.top) is a defense-in-depth
+ * compatibility control to reduce unhandled runtime traversal attempts.
  */
 export function isolateEpubIframe(iframe: HTMLIFrameElement, win?: Window | null): void {
   if (iframe) {

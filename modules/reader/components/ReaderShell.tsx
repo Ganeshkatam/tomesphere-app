@@ -23,15 +23,6 @@ export function ReaderShell({ data }: ReaderShellProps) {
   const serviceRef = useRef<ReaderService | null>(null);
   const [service, setService] = useState<ReaderService | null>(null);
 
-  // We should pass userId from auth session, but for now we'll mock it or rely on existing behavior
-  // For V1, user should be in session context or passed down. Let's assume ReaderPageDto includes userId?
-  // Ah, the user didn't specify userId in ReaderPageDto. The Facade does Auth check, so we can pass userId if needed.
-  // Let's modify ReaderPageDto to include userId if ReaderService needs it, or ReaderService can fetch it.
-  // The user says "The page should never know: Supabase, Storage, File URLs, Sessions, Progress, User. Only ReaderPageDto".
-  // So ReaderService shouldn't need `userId` to be explicitly passed down, it should just execute commands via Facades that know the user from server session!
-  // But ReaderService is client-side. Server Actions automatically know the user from cookies. So `userId` is redundant.
-  // I will refactor ReaderService to not require userId later. For now, I'll pass a dummy 'current-user' string since Server Actions don't actually need it passed.
-  const userId = "current-user";
   const [accessError, setAccessError] = useState<string | null>(null);
   const [isLoadingAccess, setIsLoadingAccess] = useState<boolean>(true);
 
@@ -61,7 +52,6 @@ export function ReaderShell({ data }: ReaderShellProps) {
       const signedUrl = await fetchSignedAccess();
 
       const newService = new ReaderService(
-        userId,
         data.book.id,
         data.session,
         data.preferences,
