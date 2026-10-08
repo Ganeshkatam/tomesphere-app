@@ -32,47 +32,71 @@ export function ReaderShell({ data }: ReaderShellProps) {
   // But ReaderService is client-side. Server Actions automatically know the user from cookies. So `userId` is redundant.
   // I will refactor ReaderService to not require userId later. For now, I'll pass a dummy 'current-user' string since Server Actions don't actually need it passed.
   const userId = "current-user";
+  const [accessError, setAccessError] = useState<string | null>(null);
+  const [isLoadingAccess, setIsLoadingAccess] = useState<boolean>(true);
+
+  const fetchSignedAccess = useCallback(async (): Promise<string> => {
+    const res = await fetch(`/api/reader/books/${encodeURIComponent(data.book.id)}/access`, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => null);
+      throw new Error(errJson?.error?.message || `Access denied (${res.status})`);
+    }
+    const accessData = await res.json();
+    if (!accessData.signedUrl) {
+      throw new Error("No signed access URL returned from authorization service");
+    }
+    return accessData.signedUrl;
+  }, [data.book.id]);
+
+  const initReader = useCallback(async () => {
+    if (!viewerRef.current) return;
+    setIsLoadingAccess(true);
+    setAccessError(null);
+
+    try {
+      const signedUrl = await fetchSignedAccess();
+
+      const newService = new ReaderService(
+        userId,
+        data.book.id,
+        data.session,
+        data.preferences,
+      );
+      serviceRef.current = newService;
+
+      const renderer = RendererFactory.create(data.book.fileType);
+
+      if (viewerRef.current) {
+        await newService.initialize(
+          renderer,
+          signedUrl,
+          viewerRef.current,
+        );
+        setService(newService);
+        setIsLoadingAccess(false);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to secure reader access";
+      const isExpectedTeardown =
+        /worker was destroyed/i.test(message) ||
+        /cancel/i.test(message);
+      if (!isExpectedTeardown) {
+        console.error("Failed to initialize Reader:", err);
+        setAccessError(message);
+      }
+      setIsLoadingAccess(false);
+    }
+  }, [data.book.id, data.book.fileType, data.session, data.preferences, fetchSignedAccess]);
 
   useEffect(() => {
-    if (!viewerRef.current) return;
-
     let mounted = true;
-
-    async function init() {
-      try {
-        const newService = new ReaderService(
-          userId,
-          data.book.id,
-          data.session,
-          data.preferences,
-        );
-        serviceRef.current = newService;
-
-        const renderer = RendererFactory.create(data.book.fileType);
-
-        if (mounted && viewerRef.current) {
-          await newService.initialize(
-            renderer,
-            data.book.fileUrl,
-            viewerRef.current,
-          );
-          if (mounted) {
-            setService(newService);
-          }
-        }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "";
-        const isExpectedTeardown =
-          /worker was destroyed/i.test(message) ||
-          /cancel/i.test(message) ||
-          !mounted;
-        if (!isExpectedTeardown) {
-          console.error("Failed to initialize Reader:", err);
-        }
-      }
+    if (mounted) {
+      void initReader();
     }
-
-    init();
 
     return () => {
       mounted = false;
@@ -82,7 +106,7 @@ export function ReaderShell({ data }: ReaderShellProps) {
         setService(null);
       }
     };
-  }, [data.book.id, data.book.fileUrl, data.book.fileType, userId]);
+  }, [initReader]);
 
   // ─── Keyboard Shortcuts ──────────────────────────────────────────
   useEffect(() => {
@@ -257,7 +281,23 @@ export function ReaderShell({ data }: ReaderShellProps) {
         <PageSideRail service={service} />
 
         <main className="flex-1 relative" onDoubleClick={handleDoubleClickViewer}>
-          <Viewer ref={viewerRef} />
+          {accessError ? (
+            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center p-6 bg-slate-900/90 text-slate-100 backdrop-blur-sm">
+              <div className="max-w-md p-6 rounded-xl border border-rose-500/30 bg-rose-950/40 text-center shadow-xl">
+                <h3 className="text-lg font-semibold text-rose-400 mb-2">Book Access Unavailable</h3>
+                <p className="text-sm text-slate-300 mb-5">{accessError}</p>
+                <button
+                  type="button"
+                  onClick={() => void initReader()}
+                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-500 transition-colors shadow"
+                >
+                  Retry Authorization
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Viewer ref={viewerRef} />
+          )}
           <HighlightPopup
             onCreateHighlight={handleCreateHighlight}
             onHighlightAndNote={handleHighlightAndNote}

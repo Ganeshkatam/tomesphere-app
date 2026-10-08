@@ -7,6 +7,7 @@ import {
 } from "@/shared/core/events/types";
 import { ReaderPreferencesDto } from "../../../application/dto/ReaderPageDto";
 import { SelectionRect } from "../../../state/reader-store";
+import { sanitizeEpubDocument, isolateEpubIframe } from "./epub-sanitizer";
 
 export class EpubJsRenderer implements ReaderRenderer {
   private book: Book | null = null;
@@ -99,6 +100,21 @@ export class EpubJsRenderer implements ReaderRenderer {
       spread: "none",
       manager: "continuous",
       flow: "scrolled", // Can be overridden by preferences
+    });
+
+    // Register defensive content hook to sanitize hostile EPUB markup before render
+    this.rendition.hooks.content.register((contents: any) => {
+      try {
+        if (contents?.document) {
+          sanitizeEpubDocument(contents.document);
+        }
+        const iframe = container.querySelector("iframe");
+        if (iframe) {
+          isolateEpubIframe(iframe, contents?.window);
+        }
+      } catch (err) {
+        console.warn("[EpubJsRenderer] Error applying hostile content sanitization:", err);
+      }
     });
 
     this.rendition.on("relocated", this.handleRelocated);
